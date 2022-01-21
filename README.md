@@ -16,3 +16,7 @@ invited to visit our small online community. You can find us on
 [Discord](https://discord.gg/dbUzqJ26vs),
 [Telegram](https://t.me/nokia_ngage) and in #ngage on
 [EFnet](http://www.efnet.org/).
+
+## Related repositories
+
+- [symbian-s60v1-SDL-1.2](https://github.com/mupfelofen-de/symbian-s60v1-SDL-1.2)
