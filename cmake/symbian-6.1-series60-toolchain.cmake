@@ -1,7 +1,7 @@
 set(CMAKE_SYSTEM_NAME Generic)
 
 set(SRC_DIR            ${CMAKE_CURRENT_SOURCE_DIR})
-set(SDK_ROOT           ${CMAKE_CURRENT_SOURCE_DIR}/../../Symbian/6.1)
+set(SDK_ROOT           ${CMAKE_CURRENT_SOURCE_DIR}/../../sdk/6.1)
 set(EPOC_PLATFORM      ${SDK_ROOT}/Shared/EPOC32)
 set(EPOC_LIB           ${SDK_ROOT}/Series60/Epoc32/Release/armi/urel)
 
