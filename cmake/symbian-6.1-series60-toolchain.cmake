@@ -1,7 +1,7 @@
 set(CMAKE_SYSTEM_NAME Generic)
 
 set(SRC_DIR            ${CMAKE_CURRENT_SOURCE_DIR})
-set(SDK_ROOT           ${CMAKE_CURRENT_SOURCE_DIR}/../Symbian/6.1)
+set(SDK_ROOT           ${CMAKE_CURRENT_SOURCE_DIR}/../../Symbian/6.1)
 set(EPOC_PLATFORM      ${SDK_ROOT}/Shared/EPOC32)
 set(EPOC_LIB           ${SDK_ROOT}/Series60/Epoc32/Release/armi/urel)
 
@@ -27,6 +27,7 @@ include_directories(
     ${SDK_ROOT}/Series60/Epoc32/Include
     ${SDK_ROOT}/Series60/Epoc32/Include/libc
     ${SDK_ROOT}/Include
+    ${CMAKE_CURRENT_BINARY_DIR}
     ${SRC_DIR})
 
 set(DEBUG_FLAGS "-save-temps")
@@ -34,7 +35,41 @@ set(CORE_FLAGS  "-s -fomit-frame-pointer -O -march=armv4t -mthumb-interwork -pip
 
 set(CMAKE_CXX_FLAGS ${CORE_FLAGS} CACHE INTERNAL "cxx compiler flags")
 
-function(build_dll machine source file_ext uid1 uid2 uid3)
+function(build_exe source file_ext uid1 uid2 uid3 libs)
+    add_custom_target(
+        ${source}.bas
+        ALL
+        DEPENDS
+        ${CMAKE_CURRENT_BINARY_DIR}/lib${source}.a
+        COMMAND
+        ${EPOC_PLATFORM}/gcc/bin/ld -s -e _E32Startup -u _E32Startup --base-file ${CMAKE_CURRENT_BINARY_DIR}/${source}.bas -o ${CMAKE_CURRENT_BINARY_DIR}/${source}_tmp.${file_ext} ${EPOC_LIB}/eexe.lib --whole-archive ${CMAKE_CURRENT_BINARY_DIR}/lib${source}.a --no-whole-archive ${libs})
+
+    add_custom_target(
+        ${source}.exp
+        ALL
+        DEPENDS
+        ${CMAKE_CURRENT_BINARY_DIR}/${source}.bas
+        COMMAND
+        ${EPOC_PLATFORM}/gcc/bin/dlltool -m arm_interwork --base-file ${CMAKE_CURRENT_BINARY_DIR}/${source}.bas --output-exp ${CMAKE_CURRENT_BINARY_DIR}/${source}.exp)
+
+    add_custom_target(
+        ${source}.${file_ext}_Intermediate
+        ALL
+        DEPENDS
+        ${CMAKE_CURRENT_BINARY_DIR}/${source}.exp
+        COMMAND
+        ${EPOC_PLATFORM}/gcc/bin/ld -s -e _E32Startup -u _E32Startup ${CMAKE_CURRENT_BINARY_DIR}/${source}.exp -Map ${CMAKE_CURRENT_BINARY_DIR}/${source}.map -o ${CMAKE_CURRENT_BINARY_DIR}/${source}.${file_ext}_Intermediate ${EPOC_LIB}/eexe.lib --whole-archive ${CMAKE_CURRENT_BINARY_DIR}/lib${source}.a --no-whole-archive ${libs})
+
+    add_custom_target(
+        ${source}.${file_ext}
+        ALL
+        DEPENDS
+        ${CMAKE_CURRENT_BINARY_DIR}/${source}.${file_ext}_Intermediate
+        COMMAND
+        ${EPOC_PLATFORM}/Tools/petran ${CMAKE_CURRENT_BINARY_DIR}/${source}.${file_ext}_Intermediate ${CMAKE_CURRENT_BINARY_DIR}/${source}.${file_ext} -nocall -uid1 ${uid1} -uid2 ${uid2} -uid3 ${uid3})
+endfunction()
+
+function(build_dll machine source file_ext uid1 uid2 uid3 libs)
     # Create new DefFile from in library
     add_custom_target(
         ${source}.def
@@ -60,7 +95,7 @@ function(build_dll machine source file_ext uid1 uid2 uid3)
         DEPENDS
         ${CMAKE_CURRENT_BINARY_DIR}/${source}_tmp.exp
         COMMAND
-        ${EPOC_PLATFORM}/gcc/bin/ld -s -e _E32Dll -u _E32Dll ${CMAKE_CURRENT_BINARY_DIR}/${source}_tmp.exp --dll --base-file ${CMAKE_CURRENT_BINARY_DIR}/${source}.bas -o ${CMAKE_CURRENT_BINARY_DIR}/${source}_tmp.${file_ext} ${EPOC_LIB}/edll.lib --whole-archive ${CMAKE_CURRENT_BINARY_DIR}/lib${source}.a --no-whole-archive ${ARGN})
+        ${EPOC_PLATFORM}/gcc/bin/ld -s -e _E32Dll -u _E32Dll ${CMAKE_CURRENT_BINARY_DIR}/${source}_tmp.exp --dll --base-file ${CMAKE_CURRENT_BINARY_DIR}/${source}.bas -o ${CMAKE_CURRENT_BINARY_DIR}/${source}_tmp.${file_ext} ${EPOC_LIB}/edll.lib --whole-archive ${CMAKE_CURRENT_BINARY_DIR}/lib${source}.a --no-whole-archive ${libs})
 
     # Create new EXPORT file with def a
     add_custom_target(
@@ -86,7 +121,7 @@ function(build_dll machine source file_ext uid1 uid2 uid3)
         DEPENDS
         ${CMAKE_CURRENT_BINARY_DIR}/${source}.lib
         COMMAND
-        ${EPOC_PLATFORM}/gcc/bin/ld -s -e _E32Dll -u _E32Dll --dll ${CMAKE_CURRENT_BINARY_DIR}/${source}.exp -Map ${CMAKE_CURRENT_BINARY_DIR}/${source}.map -o ${source}_tmp.${file_ext} ${EPOC_LIB}/edll.lib --whole-archive ${CMAKE_CURRENT_BINARY_DIR}/lib${source}.a --no-whole-archive ${ARGN})
+        ${EPOC_PLATFORM}/gcc/bin/ld -s -e _E32Dll -u _E32Dll --dll ${CMAKE_CURRENT_BINARY_DIR}/${source}.exp -Map ${CMAKE_CURRENT_BINARY_DIR}/${source}.map -o ${source}_tmp.${file_ext} ${EPOC_LIB}/edll.lib --whole-archive ${CMAKE_CURRENT_BINARY_DIR}/lib${source}.a --no-whole-archive ${libs})
 
     add_custom_target(
         ${source}.${file_ext}
@@ -124,5 +159,5 @@ function(build_resource source_dir basename)
         DEPENDS
         ${CMAKE_CURRENT_BINARY_DIR}/${basename}.RSS_Intermediate
         COMMAND
-        ${EPOC_PLATFORM}/Tools/rcomp -u -s${CMAKE_CURRENT_BINARY_DIR}/${basename}.RSS_Intermediate -o${CMAKE_CURRENT_BINARY_DIR}/${basename}.rsc)
+        ${EPOC_PLATFORM}/Tools/rcomp -u -s${CMAKE_CURRENT_BINARY_DIR}/${basename}.RSS_Intermediate -h${CMAKE_CURRENT_BINARY_DIR}/${basename}.rsg -o${CMAKE_CURRENT_BINARY_DIR}/${basename}.rsc)
 endfunction()
