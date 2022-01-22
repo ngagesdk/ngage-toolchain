@@ -1,13 +1,8 @@
 # SDL 1.2
 
-set(UID1_SDL 0x1000007a) # KExecutableImageUidValue, e32uid.h
-set(UID2_SDL 0x100039ce) # KAppUidValue16, apadef.h
-set(UID3_SDL 0x1053444c) # SDL
-
-set(GCC_COMN_DEFS -D__SYMBIAN32__ -D__GCC32__ -D__EPOC32__ -D__MARM__ -D__MARM_ARMI__ __EXE__)
+set(GCC_COMN_DEFS -D__SYMBIAN32__ -D__GCC32__ -D__EPOC32__ -D__MARM__ -D__MARM_ARMI__)
 set(GCC_MODE_DEFS -DNDEBUG -D_UNICODE)
-set(GCC_USER_DEFS -DUID1=${UID1} -DUID2=${UID2} -DUID3=${UID3})
-set(GCC_DEFS      ${GCC_COMN_DEFS} ${GCC_MODE_DEFS} ${GCC_USER_DEFS})
+set(GCC_DEFS      ${GCC_COMN_DEFS} ${GCC_MODE_DEFS})
 
 set(SRC_DIR       "${CMAKE_CURRENT_SOURCE_DIR}/../../projects/SDL-1.2/src")
 set(SDL_DIR       "${SRC_DIR}/SDL")
