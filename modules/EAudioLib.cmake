@@ -40,7 +40,7 @@ set(EAudioLib_sources
     "${EAUDIOLIB_DIR}/Scumm/common/file.cpp"
     "${EAUDIOLIB_DIR}/Scumm/common/system.cpp")
 
-add_library(EAudioLib STATIC ${SDL_sources})
+add_library(EAudioLib STATIC ${EAudioLib_sources})
 
 target_compile_definitions(
     EAudioLib
