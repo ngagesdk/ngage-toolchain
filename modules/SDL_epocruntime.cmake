@@ -9,7 +9,7 @@ set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../projects/SDL-1.2/src")
 set(SDL_epocruntime_sources
     "${SRC_DIR}/SDL_epocruntime/src/SDL_epocruntime.cpp")
 
-add_library(SDL_epocruntime STATIC ${EpocRuntime_sources})
+add_library(SDL_epocruntime STATIC ${SDL_epocruntime_sources})
 
 target_compile_definitions(
     SDL_epocruntime
