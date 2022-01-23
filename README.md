@@ -1,4 +1,4 @@
-[![ngagesdk-header](https://raw.githubusercontent.com/ngagesdk/ngage-toolchain/master/media/ngagesdk-header-1x-white.png)](https://raw.githubusercontent.com/ngagesdk/ngage-toolchain/master/media/ngagesdk-header-2x-white.png?raw=true "ngagesdk-header")
+[![N-Gage SDK.](https://raw.githubusercontent.com/ngagesdk/ngage-toolchain/master/media/ngagesdk-readme-header.png)](https://raw.githubusercontent.com/ngagesdk/ngage-toolchain/master/media/ngagesdk-readme-header.png?raw=true "N-Gage SDK.")
 
 # ngage-toolchain
 
