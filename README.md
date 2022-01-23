@@ -2,12 +2,14 @@
 
 # ngage-toolchain
 
-A toolchain for Symbian S60v1 devices such as the Nokia
-N-Gage.
+A toolchain for Symbian S60v1 devices such as the Nokia N-Gage.
 
-This project is part of a larger project aiming to create a functional
-ecosystem for developing (or porting existing) games for the Nokia
-N-Gage using modern tools such as Visual Studio 2019/2022 and CMake.
+## About
+
+First of all, this is not a leak of the so far unreleased Nokia N-Gage
+SDK (which was ultimately just an extended Symbian SDK), but a
+comprehensive system that serves the development of games and
+applications for the Nokia N-Gage on modern systems.
 
 This toolchain is the core of this project and provides the basis for
 all projects that build on it.
