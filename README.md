@@ -1,3 +1,5 @@
+[![ngagesdk-header](https://raw.githubusercontent.com/ngagesdk/ngage-toolchain/master/media/ngagesdk-header-1x-white.png)](https://raw.githubusercontent.com/ngagesdk/ngage-toolchain/master/media/ngagesdk-header-2x-white.png?raw=true "ngagesdk-header")
+
 # ngage-toolchain
 
 A toolchain for Symbian S60v1 devices such as the Nokia
@@ -26,3 +28,10 @@ the file `cygwin1.dll`.
 ## Related repositories
 
 - [SDL-1.2](https://github.com/ngagesdk/SDL-1.2)
+
+## Credits
+
+The [N-Gage SDK logo](media/) was designed by [Dan
+Whelan](https://danwhelan.ie) and is licensed under the Creative Commons
+[Attribution-ShareAlike 4.0 International (CC BY-SA
+4.0)](https://creativecommons.org/licenses/by-sa/4.0/) license.
