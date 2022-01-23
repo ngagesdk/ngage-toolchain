@@ -31,7 +31,7 @@ the file `cygwin1.dll`.
 
 ## Credits
 
-The [N-Gage SDK logo](media/) was designed by [Dan
-Whelan](https://danwhelan.ie) and is licensed under the Creative Commons
-[Attribution-ShareAlike 4.0 International (CC BY-SA
-4.0)](https://creativecommons.org/licenses/by-sa/4.0/) license.
+- The [N-Gage SDK logo](media/) by [Dan Whelan](https://danwhelan.ie) is
+  licensed under a Creative Commons [Attribution-ShareAlike 4.0
+  International (CC BY-SA
+  4.0)](https://creativecommons.org/licenses/by-sa/4.0/) license.
