@@ -4,6 +4,30 @@
 
 A toolchain for Symbian S60v1 devices such as the Nokia N-Gage.
 
+## The problem
+
+Developing apps for Symbian is unnecessarily complicated. That was no
+different 20 years ago than it is today and is certainly one of the main
+reasons why a homebrew scene never emerged for the Nokia N-Gage.
+
+Until now, the easiest way to do this was to set up a virtual machine,
+install the SDK and a completely outdated version of Visual Studio. In
+addition, there was the proprietary build system, which required a Perl
+installation that could be installed along with it.
+
+In a nutshell, Symbian development has never been a convenient thing.
+
+## The solution
+
+CMake, because it provides a perfect foundation for automating
+complicated build procedures and is natively supported by many modern
+development environments such as Visual Studio.
+
+Even though this project is still in its early stages, it is already
+possible to compile apps for the platform in a relatively uncomplicated
+manner. Overall, the toolchain has a modular design and can be extended
+by additional libraries as needed.
+
 ## About
 
 First of all, this is not a leak of the so far unreleased Nokia N-Gage
