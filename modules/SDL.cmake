@@ -5,8 +5,9 @@ set(GCC_MODULE_MODE_DEFS -DNDEBUG -D_UNICODE)
 set(GCC_MODULE_DEFS      ${GCC_MODULE_COMN_DEFS} ${GCC_MODULE_MODE_DEFS})
 
 set(SRC_DIR       "${CMAKE_CURRENT_SOURCE_DIR}/../../projects/SDL-1.2/src")
-set(SDL_DIR       "${SRC_DIR}/SDL")
 set(EAUDIOLIB_DIR "${SRC_DIR}/EAudioLib")
+set(SDL_DIR       "${SRC_DIR}/SDL")
+set(SDL_INC_DIR   "${SDL_DIR}/include")
 
 set(SDL_sources
     # General sources
@@ -77,7 +78,7 @@ target_compile_definitions(
 target_include_directories(
     SDL
     PUBLIC
-    ${SDL_DIR}/include
+    ${SDL_INC_DIR}
     ${SDL_DIR}/src/
     ${SDL_DIR}/src/video
     ${SDL_DIR}/src/video/epoc
