@@ -135,39 +135,25 @@ function(build_dll machine source file_ext uid1 uid2 uid3 libs)
         ${EPOC_PLATFORM}/Tools/petran ${CMAKE_CURRENT_BINARY_DIR}/${source}_tmp.${file_ext} ${CMAKE_CURRENT_BINARY_DIR}/${source}.${file_ext} -nocall -uid1 ${uid1} -uid2 ${uid2} -uid3 ${uid3})
 endfunction()
 
-function(copy_file source_dir dest_dir file)
+function(copy_file main_dep source_dir dest_dir file)
     add_custom_command(
-        OUTPUT
-        ${dest_dir}/${file}
-        DEPENDS
-        ${file}_copy
+        TARGET
+        ${main_dep}
+        POST_BUILD
         COMMAND
         ${CMAKE_COMMAND} -E copy
         ${source_dir}/${file}
-        ${dest_dir}/${file})
-
-    add_custom_target(
-        ${file}_copy
-        ALL
-        DEPENDS
         ${dest_dir}/${file})
 endfunction()
 
-function(install_file project_name source_dir file drive_letter)
+function(install_file main_dep project_name source_dir file drive_letter)
     add_custom_command(
-        OUTPUT
-        ${drive_letter}:/system/apps/${project_name}/${file}
-        DEPENDS
-        ${file}_install
+        TARGET
+        ${main_dep}
+        POST_BUILD
         COMMAND
         ${CMAKE_COMMAND} -E copy
         ${source_dir}/${file}
-        ${drive_letter}:/system/apps/${project_name}/${file})
-
-    add_custom_target(
-        ${file}_install
-        ALL
-        DEPENDS
         ${drive_letter}:/system/apps/${project_name}/${file})
 endfunction()
 
