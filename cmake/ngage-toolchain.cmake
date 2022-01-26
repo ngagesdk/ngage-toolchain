@@ -5,6 +5,9 @@ set(SDK_ROOT           ${CMAKE_CURRENT_SOURCE_DIR}/../../sdk/6.1)
 set(EPOC_PLATFORM      ${SDK_ROOT}/Shared/EPOC32)
 set(EPOC_LIB           ${SDK_ROOT}/Series60/Epoc32/Release/armi/urel)
 
+set(EKA2L1_DIR         ${CMAKE_CURRENT_SOURCE_DIR}/../../sdk/eka2l1)
+set(EKA2L1_E_DRIVE     ${EKA2L1_DIR}/data/drives/e)
+
 set(CMAKE_C_COMPILER   ${EPOC_PLATFORM}/gcc/bin/gcc.exe)
 set(CMAKE_CXX_COMPILER ${EPOC_PLATFORM}/gcc/bin/gcc.exe)
 set(CMAKE_OBJCOPY      ${EPOC_PLATFORM}/gcc/bin/objcopy.exe)
@@ -26,7 +29,7 @@ include_directories(
     ${EPOC_PLATFORM}/include
     ${SDK_ROOT}/Series60/Epoc32/Include
     ${SDK_ROOT}/Series60/Epoc32/Include/libc
-    ${SDK_ROOT}/Include
+    ${SDK_ROOT}/include
     ${CMAKE_CURRENT_BINARY_DIR}
     ${SRC_DIR})
 
@@ -132,15 +135,39 @@ function(build_dll machine source file_ext uid1 uid2 uid3 libs)
         ${EPOC_PLATFORM}/Tools/petran ${CMAKE_CURRENT_BINARY_DIR}/${source}_tmp.${file_ext} ${CMAKE_CURRENT_BINARY_DIR}/${source}.${file_ext} -nocall -uid1 ${uid1} -uid2 ${uid2} -uid3 ${uid3})
 endfunction()
 
+function(copy_file source_dir dest_dir file)
+    add_custom_command(
+        OUTPUT
+        ${dest_dir}/${file}
+        DEPENDS
+        ${file}_copy
+        COMMAND
+        ${CMAKE_COMMAND} -E copy
+        ${source_dir}/${file}
+        ${dest_dir}/${file})
+
+    add_custom_target(
+        ${file}_copy
+        ALL
+        DEPENDS
+        ${dest_dir}/${file})
+endfunction()
+
 function(install_file project_name source_dir file drive_letter)
+    add_custom_command(
+        OUTPUT
+        ${drive_letter}:/system/apps/${project_name}/${file}
+        DEPENDS
+        ${file}_install
+        COMMAND
+        ${CMAKE_COMMAND} -E copy
+        ${source_dir}/${file}
+        ${drive_letter}:/system/apps/${project_name}/${file})
+
     add_custom_target(
         ${file}_install
         ALL
         DEPENDS
-        ${source_dir}/${file}
-        COMMAND
-        ${CMAKE_COMMAND} -E copy
-        ${source_dir}/${file}
         ${drive_letter}:/system/apps/${project_name}/${file})
 endfunction()
 
