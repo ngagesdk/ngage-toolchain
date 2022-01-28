@@ -31,9 +31,10 @@ by additional libraries as needed.
 ## About
 
 First of all, this is not a leak of the so far unreleased Nokia N-Gage
-SDK (which was ultimately just an extended Symbian SDK), but a
-comprehensive system that serves the development of games and
-applications for the Nokia N-Gage on modern systems.
+SDK (which was ultimately just an extended Symbian SDK), but a copy of
+the freely available SDK by Nokia along with a comprehensive system that
+serves the development of games and applications for the Nokia N-Gage on
+modern systems.
 
 This toolchain is the core of this project and provides the basis for
 all projects that build on it.
