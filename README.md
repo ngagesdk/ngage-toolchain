@@ -31,10 +31,9 @@ by additional libraries as needed.
 ## About
 
 First of all, this is not a leak of the so far unreleased Nokia N-Gage
-SDK (which was ultimately just an extended Symbian SDK), but a copy of
-the freely available SDK by Nokia along with a comprehensive system that
-serves the development of games and applications for the Nokia N-Gage on
-modern systems.
+SDK (which was ultimately just an extended Symbian SDK), but a
+comprehensive system that allows the original and freely available
+Symbian S60v1 SDK to be used with modern tools.
 
 This toolchain is the core of this project and provides the basis for
 all projects that build on it.
@@ -44,6 +43,10 @@ invited to visit our small online community. You can find us on
 [Discord](https://discord.gg/dbUzqJ26vs),
 [Telegram](https://t.me/nokia_ngage) and in #ngage on
 [EFnet](http://www.efnet.org/).
+
+## How-to
+
+Soon to follow.
 
 ## Important
 
@@ -59,9 +62,12 @@ the file `cygwin1.dll`.
 - [snprintf](https://github.com/ngagesdk/snprintf)
 - [stdint](https://github.com/ngagesdk/stdint)
 
-## Credits
+## Licence and Credits
 
-- The [N-Gage SDK logo](media/) by [Dan Whelan](https://danwhelan.ie) is
-  licensed under a Creative Commons [Attribution-ShareAlike 4.0
-  International (CC BY-SA
-  4.0)](https://creativecommons.org/licenses/by-sa/4.0/) license.
+This project is licensed under the "The MIT License".  See the file
+[LICENSE.md](LICENSE.md) for details.
+
+The [N-Gage SDK logo](media/) by [Dan Whelan](https://danwhelan.ie) is
+licensed under a Creative Commons [Attribution-ShareAlike 4.0
+International (CC BY-SA
+4.0)](https://creativecommons.org/licenses/by-sa/4.0/) license.
