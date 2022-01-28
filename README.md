@@ -71,6 +71,7 @@ the file `cygwin1.dll`.
 
 - [SDL-1.2](https://github.com/ngagesdk/SDL-1.2)
 - [dbgprint](https://github.com/ngagesdk/dbgprint)
+- [setup](https://github.com/ngagesdk/setup)
 - [snprintf](https://github.com/ngagesdk/snprintf)
 - [stdint](https://github.com/ngagesdk/stdint)
 
