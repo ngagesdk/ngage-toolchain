@@ -54,6 +54,9 @@ the file `cygwin1.dll`.
 ## Related repositories
 
 - [SDL-1.2](https://github.com/ngagesdk/SDL-1.2)
+- [dbgprint](https://github.com/ngagesdk/dbgprint)
+- [snprint](https://github.com/ngagesdk/snprintf)
+- [stdint](https://github.com/ngagesdk/stdint)
 
 ## Credits
 
