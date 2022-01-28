@@ -46,7 +46,19 @@ invited to visit our small online community. You can find us on
 
 ## How-to
 
-Soon to follow.
+Clone the [setup](https://github.com/ngagesdk/setup) repository into the
+projects sub-directory of the toolchain:
+
+```bash
+git clone https://github.com/ngagesdk/ngage-toolchain.git
+cd ngage-toolchain
+cd projects
+git clone https://github.com/ngagesdk/setup.git
+```
+
+Open the cloned directory in Visual Studio and wait until the CMake
+solution has finished generating. Then build the project so that the
+necessary dependencies are downloaded and installed.
 
 ## Important
 
@@ -64,10 +76,10 @@ the file `cygwin1.dll`.
 
 ## Licence and Credits
 
-This project is licensed under the "The MIT License".  See the file
-[LICENSE.md](LICENSE.md) for details.
+- This project is licensed under the "The MIT License".  See the file
+  [LICENSE.md](LICENSE.md) for details.
 
-The [N-Gage SDK logo](media/) by [Dan Whelan](https://danwhelan.ie) is
-licensed under a Creative Commons [Attribution-ShareAlike 4.0
-International (CC BY-SA
-4.0)](https://creativecommons.org/licenses/by-sa/4.0/) license.
+- The [N-Gage SDK logo](media/) by [Dan Whelan](https://danwhelan.ie) is
+  licensed under a Creative Commons [Attribution-ShareAlike 4.0
+  International (CC BY-SA
+  4.0)](https://creativecommons.org/licenses/by-sa/4.0/) license.
