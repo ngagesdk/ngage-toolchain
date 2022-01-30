@@ -75,6 +75,10 @@ the file `cygwin1.dll`.
 - [snprintf](https://github.com/ngagesdk/snprintf)
 - [stdint](https://github.com/ngagesdk/stdint)
 
+Any repository created or forked by the
+[ngagesdk](https://github.com/ngagesdk) account that is not listed here
+is not yet supported by the toolchain.
+
 ## Licence and Credits
 
 - This project is licensed under the "The MIT License".  See the file
