@@ -4,11 +4,11 @@ set(GCC_MODULE_COMN_DEFS -D__SYMBIAN32__ -D__GCC32__ -D__EPOC32__ -D__MARM__ -D_
 set(GCC_MODULE_MODE_DEFS -DNDEBUG -D_UNICODE)
 set(GCC_MODULE_DEFS      ${GCC_MODULE_COMN_DEFS} ${GCC_MODULE_MODE_DEFS})
 
-set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../projects/SDL-1.2/src")
-set(SDL_DIR "${SRC_DIR}/SDL")
+set(SRC_DIR   "${CMAKE_CURRENT_SOURCE_DIR}/../../projects/SDL-1.2/src")
+set(SDL12_DIR "${SRC_DIR}/SDL")
 
 set(SDLmain_sources
-    "${SDL_DIR}/src/main/epoc/SDL_main.cpp")
+    "${SDL12_DIR}/src/main/epoc/SDL_main.cpp")
 
 add_library(SDLmain STATIC ${SDLmain_sources})
 
@@ -20,4 +20,4 @@ target_compile_definitions(
 target_include_directories(
     SDLmain
     PUBLIC
-    ${SDL_DIR}/include)
+    ${SDL12_DIR}/include)

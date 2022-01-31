@@ -24,6 +24,9 @@ set(CMAKE_CXX_COMPILER_ID_RUN TRUE)
 set(CMAKE_CXX_COMPILER_FORCED TRUE)
 set(CMAKE_CXX_COMPILER_WORKS  TRUE)
 
+add_compile_definitions(
+    __NGAGE__=1)
+
 include_directories(
     SYSTEM
     ${EPOC_PLATFORM}/include
