@@ -95,11 +95,11 @@ In addition, a Symbian Application Information File (`.aif`) cannot yet
 be generated with the SDK.  This file allows you to customise the icon
 of an application. This is one of the short-term goals
 
-Also, eventually a customisable `exe`-launcher will be added, which can
+Also, eventually a customisable exe-launcher will be added, which can
 be used to start the generated SDL applications. This was common at the
 time because Symbian DLLs, unlike `.exe` files, do not have writable
 static data.  There are ways and means to overcome this difficulty, but
-a separate process also offers the benefit of `isolation.
+a separate process also offers the benefit of isolation.
 
 ## Licence and Credits
 
