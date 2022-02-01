@@ -5,7 +5,7 @@ set(GCC_MODULE_MODE_DEFS -DNDEBUG -D_UNICODE)
 set(GCC_MODULE_DEFS      ${GCC_MODULE_COMN_DEFS} ${GCC_MODULE_MODE_DEFS})
 
 set(SDL_DIR     "${CMAKE_CURRENT_SOURCE_DIR}/../../projects/SDL/")
-set(SRC_DIR      "${SDL_DIR}/src")
+set(SRC_DIR     "${SDL_DIR}/src")
 set(SDL_INC_DIR "${SDL_DIR}/include")
 
 set(SDL_sources
@@ -25,6 +25,7 @@ set(SDL_sources
     "${SRC_DIR}/audio/SDL_wave.c"
     "${SRC_DIR}/audio/dummy/SDL_dummyaudio.c"
     "${SRC_DIR}/cpuinfo/SDL_cpuinfo.c"
+    "${SRC_DIR}/dynapi/SDL_dynapi.c"
     "${SRC_DIR}/events/imKStoUCS.c"
     "${SRC_DIR}/events/SDL_clipboardevents.c"
     "${SRC_DIR}/events/SDL_displayevents.c"
@@ -39,9 +40,11 @@ set(SDL_sources
     "${SRC_DIR}/file/SDL_rwops.c"
     "${SRC_DIR}/filesystem/dummy/SDL_sysfilesystem.c"
     "${SRC_DIR}/haptic/SDL_haptic.c"
+    "${SRC_DIR}/haptic/dummy/SDL_syshaptic.c"
     "${SRC_DIR}/hidapi/SDL_hidapi.c"
     "${SRC_DIR}/joystick/SDL_gamecontroller.c"
     "${SRC_DIR}/joystick/SDL_joystick.c"
+    "${SRC_DIR}/joystick/dummy/SDL_sysjoystick.c"
     "${SRC_DIR}/libm/e_atan2.c"
     "${SRC_DIR}/libm/e_exp.c"
     "${SRC_DIR}/libm/e_fmod.c"
@@ -91,6 +94,7 @@ set(SDL_sources
     "${SRC_DIR}/stdlib/SDL_string.c"
     "${SRC_DIR}/stdlib/SDL_strtokr.c"
     "${SRC_DIR}/thread/SDL_thread.c"
+    "${SRC_DIR}/thread/generic/SDL_systls.c"
     "${SRC_DIR}/thread/ngage/SDL_sysmutex.cpp"
     "${SRC_DIR}/thread/ngage/SDL_systhread.cpp"
     "${SRC_DIR}/thread/ngage/SDL_syssem.cpp"
