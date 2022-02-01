@@ -41,14 +41,14 @@ set(CORE_FLAGS  "-s -fomit-frame-pointer -O -march=armv4t -mthumb-interwork -pip
 
 set(CMAKE_CXX_FLAGS ${CORE_FLAGS} CACHE INTERNAL "cxx compiler flags")
 
-function(build_exe source file_ext uid1 uid2 uid3 libs)
+function(build_exe_static source file_ext uid1 uid2 uid3 static_libs libs)
     add_custom_target(
         ${source}.bas
         ALL
         DEPENDS
         ${CMAKE_CURRENT_BINARY_DIR}/lib${source}.a
         COMMAND
-        ${EPOC_PLATFORM}/gcc/bin/ld -s -e _E32Startup -u _E32Startup --base-file ${CMAKE_CURRENT_BINARY_DIR}/${source}.bas -o ${CMAKE_CURRENT_BINARY_DIR}/${source}_tmp.${file_ext} ${EPOC_LIB}/eexe.lib --whole-archive ${CMAKE_CURRENT_BINARY_DIR}/lib${source}.a --no-whole-archive ${libs})
+        ${EPOC_PLATFORM}/gcc/bin/ld -s -e _E32Startup -u _E32Startup --base-file ${CMAKE_CURRENT_BINARY_DIR}/${source}.bas -o ${CMAKE_CURRENT_BINARY_DIR}/${source}_tmp.${file_ext} ${EPOC_LIB}/eexe.lib --whole-archive ${CMAKE_CURRENT_BINARY_DIR}/lib${source}.a ${static_libs} --no-whole-archive ${libs})
 
     add_custom_target(
         ${source}.exp
@@ -64,7 +64,7 @@ function(build_exe source file_ext uid1 uid2 uid3 libs)
         DEPENDS
         ${CMAKE_CURRENT_BINARY_DIR}/${source}.exp
         COMMAND
-        ${EPOC_PLATFORM}/gcc/bin/ld -s -e _E32Startup -u _E32Startup ${CMAKE_CURRENT_BINARY_DIR}/${source}.exp -Map ${CMAKE_CURRENT_BINARY_DIR}/${source}.map -o ${CMAKE_CURRENT_BINARY_DIR}/${source}.${file_ext}_Intermediate ${EPOC_LIB}/eexe.lib --whole-archive ${CMAKE_CURRENT_BINARY_DIR}/lib${source}.a --no-whole-archive ${libs})
+        ${EPOC_PLATFORM}/gcc/bin/ld -s -e _E32Startup -u _E32Startup ${CMAKE_CURRENT_BINARY_DIR}/${source}.exp -Map ${CMAKE_CURRENT_BINARY_DIR}/${source}.map -o ${CMAKE_CURRENT_BINARY_DIR}/${source}.${file_ext}_Intermediate ${EPOC_LIB}/eexe.lib --whole-archive ${CMAKE_CURRENT_BINARY_DIR}/lib${source}.a ${static_libs} --no-whole-archive ${libs})
 
     add_custom_target(
         ${source}.${file_ext}
@@ -73,6 +73,10 @@ function(build_exe source file_ext uid1 uid2 uid3 libs)
         ${CMAKE_CURRENT_BINARY_DIR}/${source}.${file_ext}_Intermediate
         COMMAND
         ${EPOC_PLATFORM}/Tools/petran ${CMAKE_CURRENT_BINARY_DIR}/${source}.${file_ext}_Intermediate ${CMAKE_CURRENT_BINARY_DIR}/${source}.${file_ext} -nocall -uid1 ${uid1} -uid2 ${uid2} -uid3 ${uid3})
+endfunction()
+
+function(build_exe source file_ext uid1 uid2 uid3 libs)
+    build_exe_static(${source} exe ${uid1} ${uid2} ${uid3} "" "${libs}")
 endfunction()
 
 function(build_dll machine source file_ext uid1 uid2 uid3 libs)
