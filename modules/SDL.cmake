@@ -4,6 +4,8 @@ set(GCC_MODULE_COMN_DEFS -D__SYMBIAN32__ -D__GCC32__ -D__EPOC32__ -D__MARM__ -D_
 set(GCC_MODULE_MODE_DEFS -DNDEBUG -D_UNICODE)
 set(GCC_MODULE_DEFS      ${GCC_MODULE_COMN_DEFS} ${GCC_MODULE_MODE_DEFS})
 
+include("${CMAKE_CURRENT_SOURCE_DIR}/../../modules/dbgprint.cmake")
+
 set(SDL_DIR     "${CMAKE_CURRENT_SOURCE_DIR}/../../projects/SDL/")
 set(SRC_DIR     "${SDL_DIR}/src")
 set(SDL_INC_DIR "${SDL_DIR}/include")
@@ -94,10 +96,14 @@ set(SDL_sources
     "${SRC_DIR}/stdlib/SDL_string.c"
     "${SRC_DIR}/stdlib/SDL_strtokr.c"
     "${SRC_DIR}/thread/SDL_thread.c"
-    "${SRC_DIR}/thread/generic/SDL_systls.c"
+#    "${SRC_DIR}/thread/generic/SDL_syscond.c"
+#    "${SRC_DIR}/thread/generic/SDL_sysmutex.c"
+#    "${SRC_DIR}/thread/generic/SDL_syssem.c"
+#    "${SRC_DIR}/thread/generic/SDL_systhread.c"
+#    "${SRC_DIR}/thread/generic/SDL_systls.c"
     "${SRC_DIR}/thread/ngage/SDL_sysmutex.cpp"
-    "${SRC_DIR}/thread/ngage/SDL_systhread.cpp"
     "${SRC_DIR}/thread/ngage/SDL_syssem.cpp"
+    "${SRC_DIR}/thread/ngage/SDL_systhread.cpp"
     "${SRC_DIR}/timer/SDL_timer.c"
     "${SRC_DIR}/timer/ngage/SDL_systimer.cpp"
     "${SRC_DIR}/video/SDL_blit_0.c"
@@ -131,9 +137,11 @@ add_library(SDL STATIC ${SDL_sources})
 target_compile_definitions(
     SDL
     PUBLIC
+    SDL_STATIC_LIB
     ${GCC_MODULE_DEFS})
 
 target_include_directories(
     SDL
     PUBLIC
-    ${SDL_INC_DIR})
+    ${SDL_INC_DIR}
+    ${DBGPRINT_INC_DIR})
