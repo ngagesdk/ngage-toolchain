@@ -100,7 +100,7 @@ set(SDL_sources
 #    "${SRC_DIR}/thread/generic/SDL_sysmutex.c"
 #    "${SRC_DIR}/thread/generic/SDL_syssem.c"
 #    "${SRC_DIR}/thread/generic/SDL_systhread.c"
-#    "${SRC_DIR}/thread/generic/SDL_systls.c"
+    "${SRC_DIR}/thread/generic/SDL_systls.c"
     "${SRC_DIR}/thread/ngage/SDL_sysmutex.cpp"
     "${SRC_DIR}/thread/ngage/SDL_syssem.cpp"
     "${SRC_DIR}/thread/ngage/SDL_systhread.cpp"
