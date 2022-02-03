@@ -12,6 +12,8 @@ comprehensive system that allows the original and freely available
 Symbian S60v1 SDK to be used with modern tools such as CMake and Visual
 Studio 2019/2022.
 
+[![Screenshot](https://raw.githubusercontent.com/ngagesdk/ngage-toolchain/master/media/ngagesdk-screenshot.png)](https://raw.githubusercontent.com/ngagesdk/ngage-toolchain/master/media/ngagesdk-screenshot.png?raw=true "Screenshot")
+
 This toolchain is the core of this project and provides the basis for
 all projects that build on it.
 
