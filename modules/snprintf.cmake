@@ -21,4 +21,4 @@ target_include_directories(
     snprintf
     PUBLIC
     ${STDINT_INC_DIR}
-    ${PRINTF_INC_DIR})
+    ${SNPRINTF_INC_DIR})
