@@ -49,7 +49,7 @@ Clone the toolchain including all sub-modules:
 git clone --recurse-submodules -j4 https://github.com/ngagesdk/ngage-toolchain.git
 ```
 
-Create the environment variable `NGAGESDK` and set it to the
+Create the environment variable `$NGAGESDK` and set it to the
 root-directory of the toolchain.  
 **Important**: Since normalizing paths with CMake does not seem to work
 properly, be sure to use slashes instead of backslashes,
