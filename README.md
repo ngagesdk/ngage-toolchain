@@ -43,42 +43,28 @@ by additional libraries as needed.
 
 ## Where do I start?
 
-Clone the [setup](https://github.com/ngagesdk/setup) repository into the
-`projects` sub-directory of the toolchain:
+Clone the toolchain including all sub-modules:
 
 ```bash
-git clone https://github.com/ngagesdk/ngage-toolchain.git
-cd ngage-toolchain
-cd projects
-git clone https://github.com/ngagesdk/setup.git
+git clone --recurse-submodules -j4 https://github.com/ngagesdk/ngage-toolchain.git
 ```
 
-Open the cloned directory in Visual Studio and wait until the CMake
-solution has finished generating.  Then build the project so that the
-necessary dependencies are downloaded and installed.
+Create the environment variable `NGAGESDK` and set it to the
+root-directory of the toolchain.  
+**Important**: Since normalizing paths with CMake does not seem to work
+properly, be sure to use slashes instead of backslashes,
+e.g. `C:/ngage-toolchain`.
 
-Once the SDK has been set up, all additional repositories should also be
-cloned into the `projects` sub-directory.  It does not matter whether it
-is a project or a library.
+Once you are done, open the `setup` directory in Visual Studio and wait
+until the CMake solution has finished generating.  Then build the
+project so that the necessary dependencies are downloaded and installed.
 
 ### Important
 
 The GCC compiler for Symbian S60 is based on Cygwin. For it to work, its
-path `[Project_Dir]\sdk\6.1\Shared\EPOC32\gcc\bin` should be included in
+path `%NGAGESDK%\sdk\6.1\Shared\EPOC32\gcc\bin` should be included in
 your `$PATH` environment variable, otherwise it will not be able to find
 the file `cygwin1.dll`.
-
-## Related repositories
-
-- [SDL-1.2](https://github.com/ngagesdk/SDL-1.2)
-- [dbgprint](https://github.com/ngagesdk/dbgprint)
-- [setup](https://github.com/ngagesdk/setup)
-- [snprintf](https://github.com/ngagesdk/snprintf)
-- [stdint](https://github.com/ngagesdk/stdint)
-
-Any repository created or forked by the
-[ngagesdk](https://github.com/ngagesdk) account that is not listed here
-is not yet supported by the toolchain.
 
 ## Future goals
 

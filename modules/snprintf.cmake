@@ -4,7 +4,7 @@ set(GCC_MODULE_COMN_DEFS -D__SYMBIAN32__ -D__GCC32__ -D__EPOC32__ -D__MARM__ -D_
 set(GCC_MODULE_MODE_DEFS -DNDEBUG -D_UNICODE)
 set(GCC_MODULE_DEFS      ${GCC_MODULE_COMN_DEFS} ${GCC_MODULE_MODE_DEFS})
 
-set(SRC_DIR          "${CMAKE_CURRENT_SOURCE_DIR}/../../projects/snprintf")
+set(SRC_DIR          "${NGAGESDK}/modules/snprintf")
 set(SNPRINTF_INC_DIR "${SRC_DIR}")
 
 set(snprintf_sources

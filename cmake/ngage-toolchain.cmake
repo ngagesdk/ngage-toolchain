@@ -1,11 +1,18 @@
 set(CMAKE_SYSTEM_NAME Generic)
 
-set(SRC_DIR            ${CMAKE_CURRENT_SOURCE_DIR})
-set(SDK_ROOT           ${CMAKE_CURRENT_SOURCE_DIR}/../../sdk/6.1)
+if(DEFINED ENV{NGAGESDK})
+    SET(NGAGESDK $ENV{NGAGESDK})
+else()
+    message(FATAL_ERROR "The environment variable NGAGESDK needs to be defined.")
+endif()
+
+set(CMAKE_MODULE_PATH  "${CMAKE_MODULE_PATH};${NGAGESDK}/modules")
+
+set(SDK_ROOT           ${NGAGESDK}/sdk/6.1)
 set(EPOC_PLATFORM      ${SDK_ROOT}/Shared/EPOC32)
 set(EPOC_LIB           ${SDK_ROOT}/Series60/Epoc32/Release/armi/urel)
 
-set(EKA2L1_DIR         ${CMAKE_CURRENT_SOURCE_DIR}/../../sdk/eka2l1)
+set(EKA2L1_DIR         ${NGAGEDEV}/sdk/eka2l1)
 set(EKA2L1_E_DRIVE     ${EKA2L1_DIR}/data/drives/e)
 
 set(CMAKE_C_COMPILER   ${EPOC_PLATFORM}/gcc/bin/gcc.exe)
