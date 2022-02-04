@@ -6,7 +6,7 @@ else()
     message(FATAL_ERROR "The environment variable NGAGESDK needs to be defined.")
 endif()
 
-set(CMAKE_MODULE_PATH  "${CMAKE_MODULE_PATH};${NGAGESDK}/modules")
+set(CMAKE_MODULE_PATH  "${CMAKE_MODULE_PATH};${NGAGESDK}/cmake")
 
 set(SDK_ROOT           ${NGAGESDK}/sdk/6.1)
 set(EPOC_PLATFORM      ${SDK_ROOT}/Shared/EPOC32)
