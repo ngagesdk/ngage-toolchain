@@ -12,7 +12,7 @@ set(SDK_ROOT           ${NGAGESDK}/sdk/6.1)
 set(EPOC_PLATFORM      ${SDK_ROOT}/Shared/EPOC32)
 set(EPOC_LIB           ${SDK_ROOT}/Series60/Epoc32/Release/armi/urel)
 
-set(EKA2L1_DIR         ${NGAGEDEV}/sdk/eka2l1)
+set(EKA2L1_DIR         ${NGAGESDK}/sdk/eka2l1)
 set(EKA2L1_E_DRIVE     ${EKA2L1_DIR}/data/drives/e)
 
 set(CMAKE_C_COMPILER   ${EPOC_PLATFORM}/gcc/bin/gcc.exe)
