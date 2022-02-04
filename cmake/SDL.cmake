@@ -123,9 +123,9 @@ set(SDL_sources
     "${SRC_DIR}/video/SDL_video.c"
     "${SRC_DIR}/video/SDL_vulkan_utils.c"
     "${SRC_DIR}/video/SDL_yuv.c"
-    "${SRC_DIR}/video/dummy/SDL_nullevents.c"
-    "${SRC_DIR}/video/dummy/SDL_nullframebuffer.c"
-    "${SRC_DIR}/video/dummy/SDL_nullvideo.c"
+    "${SRC_DIR}/video/ngage/SDL_ngageevents.cpp"
+    "${SRC_DIR}/video/ngage/SDL_ngageframebuffer.cpp"
+    "${SRC_DIR}/video/ngage/SDL_ngagevideo.cpp"
     "${SRC_DIR}/video/yuv2rgb/yuv_rgb.c")
 
 add_library(SDL STATIC ${SDL_sources})
