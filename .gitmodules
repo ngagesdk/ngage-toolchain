@@ -1,12 +1,6 @@
 [submodule "modules/dbgprint"]
 	path = modules/dbgprint
 	url = https://github.com/ngagesdk/dbgprint.git
-[submodule "modules/snprintf"]
-	path = modules/snprintf
-	url = https://github.com/ngagesdk/snprintf.git
-[submodule "modules/stdint"]
-	path = modules/stdint
-	url = https://github.com/ngagesdk/stdint.git
 [submodule "modules/SDL"]
 	path = modules/SDL
 	url = https://github.com/ngagesdk/SDL.git
