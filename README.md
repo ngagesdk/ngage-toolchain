@@ -10,7 +10,7 @@ First of all, this is not a leak of the so far unreleased Nokia N-Gage
 SDK (which was ultimately just an extended Symbian SDK), but a
 comprehensive system that allows the original and freely available
 Symbian S60v1 SDK to be used with modern tools such as CMake and Visual
-Studio 2019/2022.
+Studio 2022.
 
 [![Screenshot](https://raw.githubusercontent.com/ngagesdk/ngage-toolchain/master/media/ngagesdk-screenshot.png)](https://raw.githubusercontent.com/ngagesdk/ngage-toolchain/master/media/ngagesdk-screenshot.png?raw=true "Screenshot")
 
