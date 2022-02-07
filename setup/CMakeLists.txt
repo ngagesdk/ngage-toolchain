@@ -28,7 +28,7 @@ ExternalProject_Add(SymbianSDK
 
 ExternalProject_Add(EKA2L1
     URL https://github.com/EKA2L1/EKA2L1/releases/download/continous/windows-latest.zip
-    URL_HASH SHA1=740da084846025f223d8c96b979cd837fb9bd11d
+    URL_HASH SHA1=5115e704fc2a6b5d371596d903d38283fd072004
     DOWNLOAD_DIR ${SDK_DIR}/cache
     DOWNLOAD_NO_PROGRESS true
     TLS_VERIFY true
