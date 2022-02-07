@@ -4,8 +4,6 @@ set(GCC_MODULE_COMN_DEFS -D__SYMBIAN32__ -D__GCC32__ -D__EPOC32__ -D__MARM__ -D_
 set(GCC_MODULE_MODE_DEFS -DNDEBUG -D_UNICODE)
 set(GCC_MODULE_DEFS      ${GCC_MODULE_COMN_DEFS} ${GCC_MODULE_MODE_DEFS})
 
-include(dbgprint)
-
 set(SDL_DIR     "${NGAGESDK}/modules/SDL/")
 set(SRC_DIR     "${SDL_DIR}/src")
 set(SDL_INC_DIR "${SDL_DIR}/include")
@@ -139,5 +137,4 @@ target_compile_definitions(
 target_include_directories(
     SDL
     PUBLIC
-    ${SDL_INC_DIR}
-    ${DBGPRINT_INC_DIR})
+    ${SDL_INC_DIR})
