@@ -86,7 +86,7 @@ function(build_exe source file_ext uid1 uid2 uid3 libs)
     build_exe_static(${source} exe ${uid1} ${uid2} ${uid3} "" "${libs}")
 endfunction()
 
-function(build_dll machine source file_ext uid1 uid2 uid3 libs)
+function(build_dll source file_ext uid1 uid2 uid3 libs)
     # Create new DefFile from in library
     add_custom_target(
         ${source}.def
@@ -94,7 +94,7 @@ function(build_dll machine source file_ext uid1 uid2 uid3 libs)
         DEPENDS
         ${CMAKE_CURRENT_BINARY_DIR}/lib${source}.a
         COMMAND
-        ${EPOC_PLATFORM}/gcc/bin/dlltool -m ${machine} --output-def ${CMAKE_CURRENT_BINARY_DIR}/${source}.def ${CMAKE_CURRENT_BINARY_DIR}/lib${source}.a)
+        ${EPOC_PLATFORM}/gcc/bin/dlltool -m arm_interwork --output-def ${CMAKE_CURRENT_BINARY_DIR}/${source}.def ${CMAKE_CURRENT_BINARY_DIR}/lib${source}.a)
 
     # Create new Export file from generated DefFle
     add_custom_target(
@@ -103,7 +103,7 @@ function(build_dll machine source file_ext uid1 uid2 uid3 libs)
         DEPENDS
         ${CMAKE_CURRENT_BINARY_DIR}/${source}.def
         COMMAND
-        ${EPOC_PLATFORM}/gcc/bin/dlltool -m ${machine} --def ${CMAKE_CURRENT_BINARY_DIR}/${source}.def --output-exp ${CMAKE_CURRENT_BINARY_DIR}/${source}_tmp.exp --dllname ${source}[${uid3}].${file_ext})
+        ${EPOC_PLATFORM}/gcc/bin/dlltool -m arm_interwork --def ${CMAKE_CURRENT_BINARY_DIR}/${source}.def --output-exp ${CMAKE_CURRENT_BINARY_DIR}/${source}_tmp.exp --dllname ${source}[${uid3}].${file_ext})
 
     # Create new Base file
     add_custom_target(
@@ -121,7 +121,7 @@ function(build_dll machine source file_ext uid1 uid2 uid3 libs)
         DEPENDS
         ${CMAKE_CURRENT_BINARY_DIR}/${source}.bas
         COMMAND
-        ${EPOC_PLATFORM}/gcc/bin/dlltool -m ${machine} --def ${CMAKE_CURRENT_BINARY_DIR}/${source}.def --dllname ${source}[${uid3}].${file_ext} --base-file ${CMAKE_CURRENT_BINARY_DIR}/${source}.bas --output-exp ${CMAKE_CURRENT_BINARY_DIR}/${source}.exp)
+        ${EPOC_PLATFORM}/gcc/bin/dlltool -m arm_interwork --def ${CMAKE_CURRENT_BINARY_DIR}/${source}.def --dllname ${source}[${uid3}].${file_ext} --base-file ${CMAKE_CURRENT_BINARY_DIR}/${source}.bas --output-exp ${CMAKE_CURRENT_BINARY_DIR}/${source}.exp)
 
     # Create new interface LIB file with def a
     add_custom_target(
@@ -130,7 +130,7 @@ function(build_dll machine source file_ext uid1 uid2 uid3 libs)
         DEPENDS
         ${CMAKE_CURRENT_BINARY_DIR}/${source}.exp
         COMMAND
-        ${EPOC_PLATFORM}/gcc/bin/dlltool -m ${machine} --def ${CMAKE_CURRENT_BINARY_DIR}/${source}.def --dllname ${source}[${uid3}].${file_ext} --base-file ${CMAKE_CURRENT_BINARY_DIR}/${source}.bas --output-lib ${CMAKE_CURRENT_BINARY_DIR}/${source}.lib)
+        ${EPOC_PLATFORM}/gcc/bin/dlltool -m arm_interwork --def ${CMAKE_CURRENT_BINARY_DIR}/${source}.def --dllname ${source}[${uid3}].${file_ext} --base-file ${CMAKE_CURRENT_BINARY_DIR}/${source}.bas --output-lib ${CMAKE_CURRENT_BINARY_DIR}/${source}.lib)
 
     add_custom_target(
         ${source}.map
@@ -149,15 +149,24 @@ function(build_dll machine source file_ext uid1 uid2 uid3 libs)
         ${EPOC_PLATFORM}/Tools/petran ${CMAKE_CURRENT_BINARY_DIR}/${source}_tmp.${file_ext} ${CMAKE_CURRENT_BINARY_DIR}/${source}.${file_ext} -nocall -uid1 ${uid1} -uid2 ${uid2} -uid3 ${uid3})
 endfunction()
 
-function(copy_file main_dep source_dir dest_dir file)
+function(copy_file_ex main_dep source_dir dest_dir src_file dst_file)
     add_custom_command(
         TARGET
         ${main_dep}
         POST_BUILD
         COMMAND
         ${CMAKE_COMMAND} -E copy
-        ${source_dir}/${file}
-        ${dest_dir}/${file})
+        ${source_dir}/${src_file}
+        ${dest_dir}/${dst_file})
+endfunction()
+
+function(copy_file main_dep source_dir dest_dir file)
+    copy_file_ex(
+        ${main_dep}
+        ${source_dir}
+        ${dest_dir}
+        ${file}
+        ${file})
 endfunction()
 
 function(install_file main_dep project_name source_dir file drive_letter)
@@ -171,14 +180,14 @@ function(install_file main_dep project_name source_dir file drive_letter)
         ${drive_letter}:/system/apps/${project_name}/${file})
 endfunction()
 
-function(build_resource source_dir basename)
+function(build_resource source_dir basename extra_args)
     add_custom_target(
         ${basename}.RSS_Intermediate
         ALL
         DEPENDS
         ${source_dir}/${basename}.rss
         COMMAND
-        ${EPOC_PLATFORM}/gcc/bin/cpp -I${SDK_ROOT}/Series60/Epoc32/Include -I${source_dir} -I${source_dir}/../inc ${source_dir}/${basename}.rss ${CMAKE_CURRENT_BINARY_DIR}/${basename}.RSS_Intermediate)
+        ${EPOC_PLATFORM}/gcc/bin/cpp ${extra_args} -I${SDK_ROOT}/Series60/Epoc32/Include -I${source_dir} -I${source_dir}/../inc ${source_dir}/${basename}.rss ${CMAKE_CURRENT_BINARY_DIR}/${basename}.RSS_Intermediate)
 
     add_custom_target(
         ${basename}.rsc
@@ -187,4 +196,16 @@ function(build_resource source_dir basename)
         ${CMAKE_CURRENT_BINARY_DIR}/${basename}.RSS_Intermediate
         COMMAND
         ${EPOC_PLATFORM}/Tools/rcomp -u -s${CMAKE_CURRENT_BINARY_DIR}/${basename}.RSS_Intermediate -h${CMAKE_CURRENT_BINARY_DIR}/${basename}.rsg -o${CMAKE_CURRENT_BINARY_DIR}/${basename}.rsc)
+endfunction()
+
+function(build_aif source_dir basename uid3)
+    add_custom_target(
+        ${basename}.aif
+        ALL
+        DEPENDS
+        ${source_dir}/${basename}.aifspec
+        WORKING_DIRECTORY
+        ${source_dir}
+        COMMAND
+        ${NGAGESDK}/sdk/tools/genaif -u ${uid3} ${source_dir}/${basename}.aifspec ${CMAKE_CURRENT_BINARY_DIR}/${basename}.aif)
 endfunction()
