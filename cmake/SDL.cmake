@@ -124,6 +124,7 @@ set(SDL_sources
     "${SRC_DIR}/video/ngage/SDL_ngageevents.cpp"
     "${SRC_DIR}/video/ngage/SDL_ngageframebuffer.cpp"
     "${SRC_DIR}/video/ngage/SDL_ngagevideo.cpp"
+    "${SRC_DIR}/video/ngage/SDL_ngagewindow.cpp"
     "${SRC_DIR}/video/yuv2rgb/yuv_rgb.c")
 
 add_library(SDL STATIC ${SDL_sources})
@@ -133,6 +134,11 @@ target_compile_definitions(
     PUBLIC
     SDL_STATIC_LIB
     ${GCC_MODULE_DEFS})
+
+target_compile_options(
+    SDL
+    PUBLIC
+    -O3)
 
 target_include_directories(
     SDL
