@@ -27,8 +27,8 @@ ExternalProject_Add(SymbianSDK
     "${SDK_DIR}/../cmake/stub-sdk.cmake" ${SDK_ROOT}/CMakeLists.txt)
 
 ExternalProject_Add(EKA2L1
-    URL https://github.com/EKA2L1/EKA2L1/releases/download/continous/windows-latest.zip
-    URL_HASH SHA1=5115e704fc2a6b5d371596d903d38283fd072004
+    URL https://mupf.dev/eka2l1.zip
+    URL_HASH SHA1=0f172f0ae5f12dffcd191065922bf66754d44504
     DOWNLOAD_DIR ${SDK_DIR}/cache
     DOWNLOAD_NO_PROGRESS true
     TLS_VERIFY true
