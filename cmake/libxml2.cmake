@@ -1,8 +1,12 @@
 # libxml2
 
+include_guard(GLOBAL)
+
 set(GCC_MODULE_COMN_DEFS -D__SYMBIAN32__ -D__GCC32__ -D__EPOC32__ -D__MARM__ -D__MARM_ARMI__)
 set(GCC_MODULE_MODE_DEFS -DNDEBUG -D_UNICODE)
 set(GCC_MODULE_DEFS      ${GCC_MODULE_COMN_DEFS} ${GCC_MODULE_MODE_DEFS})
+
+include(zlib)
 
 set(LIBXML2_DIR     "${NGAGESDK}/modules/libxml2")
 set(SRC_DIR         "${LIBXML2_DIR}")
@@ -69,4 +73,5 @@ target_compile_options(
 target_include_directories(
     xml2
     PUBLIC
-    ${LIBXML2_INC_DIR})
+    ${LIBXML2_INC_DIR}
+    ${ZLIB_INC_DIR})

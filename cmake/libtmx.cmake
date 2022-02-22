@@ -1,10 +1,13 @@
 # libtmx
 
+include_guard(GLOBAL)
+
 set(GCC_MODULE_COMN_DEFS -D__SYMBIAN32__ -D__GCC32__ -D__EPOC32__ -D__MARM__ -D__MARM_ARMI__)
 set(GCC_MODULE_MODE_DEFS -DNDEBUG -D_UNICODE)
 set(GCC_MODULE_DEFS      ${GCC_MODULE_COMN_DEFS} ${GCC_MODULE_MODE_DEFS})
 
 include(libxml2)
+include(zlib)
 
 set(LIBTMX_DIR     "${NGAGESDK}/modules/tmx")
 set(SRC_DIR        "${LIBTMX_DIR}/src")
@@ -23,6 +26,7 @@ add_library(tmx STATIC ${libtmx_sources})
 target_compile_definitions(
     tmx
     PUBLIC
+    WANT_ZLIB
     ${GCC_MODULE_DEFS})
 
 target_compile_options(
@@ -34,4 +38,5 @@ target_include_directories(
     tmx
     PUBLIC
     ${LIBXML2_INC_DIR}
-    ${LIBTMX_INC_DIR})
+    ${LIBTMX_INC_DIR}
+    ${ZLIB_INC_DIR})

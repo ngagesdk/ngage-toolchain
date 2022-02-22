@@ -1,5 +1,7 @@
 # dbgprintf
 
+include_guard(GLOBAL)
+
 if(DEFINED ENV{NGAGESDK})
     SET(NGAGESDK $ENV{NGAGESDK})
 else()
