@@ -16,3 +16,6 @@
 [submodule "modules/cwalk"]
 	path = modules/cwalk
 	url = https://github.com/ngagesdk/cwalk.git
+[submodule "modules/zlib"]
+	path = modules/zlib
+	url = https://github.com/ngagesdk/zlib.git
