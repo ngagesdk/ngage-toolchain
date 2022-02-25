@@ -8,9 +8,11 @@ endif()
 
 set(CMAKE_MODULE_PATH  "${CMAKE_MODULE_PATH};${NGAGESDK}/cmake")
 
-set(SDK_ROOT           ${NGAGESDK}/sdk/6.1)
-set(EPOC_PLATFORM      ${SDK_ROOT}/Shared/EPOC32)
-set(EPOC_LIB           ${SDK_ROOT}/Series60/Epoc32/Release/armi/urel)
+set(SDK_ROOT             ${NGAGESDK}/sdk/6.1)
+set(EPOC_PLATFORM        ${SDK_ROOT}/Shared/EPOC32)
+set(EPOC_LIB             ${SDK_ROOT}/Series60/Epoc32/Release/armi/urel)
+set(STB_INC_DIR          ${NGAGESDK}/modules/stb)
+set(CUTE_HEADERS_INC_DIR ${NGAGESDK}/modules/cute_headers)
 
 set(EKA2L1_DIR         ${NGAGESDK}/sdk/eka2l1)
 set(EKA2L1_E_DRIVE     ${EKA2L1_DIR}/data/drives/e)
@@ -40,6 +42,8 @@ include_directories(
     ${SDK_ROOT}/Series60/Epoc32/Include
     ${SDK_ROOT}/Series60/Epoc32/Include/libc
     ${SDK_ROOT}/include
+    ${STB_INC_DIR}
+    ${CUTE_HEADERS_INC_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
     ${SRC_DIR})
 
@@ -79,7 +83,7 @@ function(build_exe_static source file_ext uid1 uid2 uid3 static_libs libs)
         DEPENDS
         ${CMAKE_CURRENT_BINARY_DIR}/${source}.${file_ext}_Intermediate
         COMMAND
-        ${EPOC_PLATFORM}/Tools/petran ${CMAKE_CURRENT_BINARY_DIR}/${source}.${file_ext}_Intermediate ${CMAKE_CURRENT_BINARY_DIR}/${source}.${file_ext} -nocall -uid1 ${uid1} -uid2 ${uid2} -uid3 ${uid3})
+        ${EPOC_PLATFORM}/Tools/petran ${CMAKE_CURRENT_BINARY_DIR}/${source}.${file_ext}_Intermediate ${CMAKE_CURRENT_BINARY_DIR}/${source}.${file_ext} -nocall -uid1 ${uid1} -uid2 ${uid2} -uid3 ${uid3} -stack 500000 -heap 1000000 20000000)
 endfunction()
 
 function(build_exe source file_ext uid1 uid2 uid3 libs)
