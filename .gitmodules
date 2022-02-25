@@ -7,15 +7,6 @@
 [submodule "modules/SDL-1.2"]
 	path = modules/SDL-1.2
 	url = https://github.com/ngagesdk/SDL-1.2.git
-[submodule "modules/tmx"]
-	path = modules/tmx
-	url = https://github.com/ngagesdk/tmx.git
-[submodule "modules/libxml2"]
-	path = modules/libxml2
-	url = https://github.com/ngagesdk/libxml2.git
 [submodule "modules/cwalk"]
 	path = modules/cwalk
 	url = https://github.com/ngagesdk/cwalk.git
-[submodule "modules/zlib"]
-	path = modules/zlib
-	url = https://github.com/ngagesdk/zlib.git
