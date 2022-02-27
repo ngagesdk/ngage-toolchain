@@ -15,3 +15,6 @@
 [submodule "modules/stb"]
 	path = modules/stb
 	url = https://github.com/nothings/stb.git
+[submodule "modules/cute_headers"]
+	path = modules/cute_headers
+	url = https://github.com/RandyGaul/cute_headers.git
