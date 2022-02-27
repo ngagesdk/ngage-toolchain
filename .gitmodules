@@ -16,3 +16,5 @@
 [submodule "modules/cute_headers"]
 	path = modules/cute_headers
 	url = https://github.com/ngagesdk/cute_headers.git
+[submodule "stb"]
+	url = https://github.com/nothings/stb.git
