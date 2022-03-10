@@ -66,33 +66,15 @@ path `%NGAGESDK%\sdk\6.1\Shared\EPOC32\gcc\bin` should be included in
 your `$PATH` environment variable, otherwise it will not be able to find
 the file `cygwin1.dll`.
 
-## Future goals
-
-The project has an old, functional port of SDL 1.2, which can be used to
-develop small demos and games quite easily, although the use of SDL 1.2
-is generally not recommended.
-
-As a result, many open source games that were initially ported or
-developed using SDL 1.2 have been adapted and now only support SDL 2.
-
-For this reason, one of the main goals is to port SDL 2 to make it as
-convenient as possible for future developers to create new games or to
-port existing games to the platform.
-
-In addition, a Symbian Application Information File (`.aif`) cannot yet
-be generated with the SDK.  This file allows you to customise the icon
-of an application. This is one of the short-term goals
-
-Also, eventually a customisable exe-launcher will be added, which can
-be used to start the generated SDL applications. This was common at the
-time because Symbian DLLs, unlike `.exe` files, do not have writable
-static data.  There are ways and means to overcome this difficulty, but
-a separate process also offers the benefit of isolation.
-
 ## Licence and Credits
 
 - This project is licensed under the "The MIT License".  See the file
   [LICENSE.md](LICENSE.md) for details.
+
+- Packed file system by [Daniel
+  Monteiro](https://montyontherun.itch.io/).
+
+- genaif by [Rudolf König](http://www.koeniglich.de).
 
 - The [N-Gage SDK logo](media/) by [Dan Whelan](https://danwhelan.ie) is
   licensed under a Creative Commons [Attribution-ShareAlike 4.0
