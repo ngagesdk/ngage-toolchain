@@ -153,6 +153,16 @@ function(build_dll source file_ext uid1 uid2 uid3 libs)
         ${EPOC_PLATFORM}/Tools/petran ${CMAKE_CURRENT_BINARY_DIR}/${source}_tmp.${file_ext} ${CMAKE_CURRENT_BINARY_DIR}/${source}.${file_ext} -nocall -uid1 ${uid1} -uid2 ${uid2} -uid3 ${uid3})
 endfunction()
 
+function(pack_assets resource_dir resources)
+    add_custom_target(
+        data.pfs
+        ALL
+        WORKING_DIRECTORY
+        ${resource_dir}
+        COMMAND
+        ${NGAGESDK}/sdk/tools/packer ${resources})
+endfunction()
+
 function(copy_file_ex main_dep source_dir dest_dir src_file dst_file)
     add_custom_command(
         TARGET
