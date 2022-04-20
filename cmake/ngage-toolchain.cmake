@@ -223,3 +223,15 @@ function(build_aif source_dir basename uid3)
         COMMAND
         ${NGAGESDK}/sdk/tools/genaif -u ${uid3} ${source_dir}/${basename}.aifspec ${CMAKE_CURRENT_BINARY_DIR}/${basename}.aif)
 endfunction()
+
+function(build_sis source_dir basename)
+    add_custom_target(
+        ${basename}.sis
+        ALL
+        DEPENDS
+        ${source_dir}/${basename}.pkg
+        WORKING_DIRECTORY
+        ${source_dir}
+        COMMAND
+        ${EPOC_PLATFORM}/Tools/makesis ${source_dir}/${basename}.pkg ${CMAKE_CURRENT_BINARY_DIR}/${basename}.sis)
+endfunction()
