@@ -11,6 +11,7 @@ set(CMAKE_MODULE_PATH  "${CMAKE_MODULE_PATH};${NGAGESDK}/cmake")
 set(SDK_ROOT             ${NGAGESDK}/sdk/6.1)
 set(EPOC_PLATFORM        ${SDK_ROOT}/Shared/EPOC32)
 set(EPOC_LIB             ${SDK_ROOT}/Series60/Epoc32/Release/armi/urel)
+set(AUXILIARY_INC_DIR    ${NGAGESDK}/modules/auxiliary)
 set(STB_INC_DIR          ${NGAGESDK}/modules/stb)
 set(CUTE_HEADERS_INC_DIR ${NGAGESDK}/modules/cute_headers)
 
@@ -42,6 +43,7 @@ include_directories(
     ${SDK_ROOT}/Series60/Epoc32/Include
     ${SDK_ROOT}/Series60/Epoc32/Include/libc
     ${SDK_ROOT}/include
+    ${AUXILIARY_INC_DIR}
     ${STB_INC_DIR}
     ${CUTE_HEADERS_INC_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
