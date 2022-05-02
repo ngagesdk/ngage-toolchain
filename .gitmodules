@@ -18,3 +18,6 @@
 [submodule "modules/cute_headers"]
 	path = modules/cute_headers
 	url = https://github.com/RandyGaul/cute_headers.git
+[submodule "modules/auxiliary"]
+	path = modules/auxiliary
+	url = https://github.com/ngagesdk/auxiliary.git
