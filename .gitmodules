@@ -3,7 +3,7 @@
 	url = https://github.com/ngagesdk/dbgprint.git
 [submodule "modules/SDL"]
 	path = modules/SDL
-	url = https://github.com/ngagesdk/SDL.git
+	url = https://github.com/libsdl-org/SDL.git
 [submodule "modules/SDL-1.2"]
 	path = modules/SDL-1.2
 	url = https://github.com/ngagesdk/SDL-1.2.git
@@ -21,3 +21,5 @@
 [submodule "modules/auxiliary"]
 	path = modules/auxiliary
 	url = https://github.com/ngagesdk/auxiliary.git
+[submodule "SDL"]
+	url = https://github.com/libsdl-org/SDL.git
