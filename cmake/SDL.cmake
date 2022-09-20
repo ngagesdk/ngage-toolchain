@@ -18,6 +18,7 @@ set(SDL_sources
     "${SRC_DIR}/SDL_hints.c"
     "${SRC_DIR}/SDL_list.c"
     "${SRC_DIR}/SDL_log.c"
+    "${SRC_DIR}/SDL_utils.c"
     "${SRC_DIR}/atomic/SDL_atomic.c"
     "${SRC_DIR}/atomic/SDL_spinlock.c"
     "${SRC_DIR}/audio/SDL_audio.c"
