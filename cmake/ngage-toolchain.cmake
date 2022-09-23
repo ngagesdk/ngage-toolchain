@@ -226,7 +226,7 @@ function(build_aif source_dir basename uid3)
         ${NGAGESDK}/sdk/tools/genaif -u ${uid3} ${source_dir}/${basename}.aifspec ${CMAKE_CURRENT_BINARY_DIR}/${basename}.aif)
 endfunction()
 
-function(build_sis main_dep source_dir basename)
+function(build_sis source_dir basename)
     add_custom_target(
         ${basename}.sis
         ALL
