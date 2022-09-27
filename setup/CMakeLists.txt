@@ -14,7 +14,7 @@ set(SDK_ROOT ${SDK_DIR}/6.1)
 include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
 
 ExternalProject_Add(SymbianSDK
-    URL https://archive.mupf.dev/S60_SDL_v1.2.zip
+    URL https://media.githubusercontent.com/media/ngagesdk/ngagesdk.github.io/master/files/S60_SDL_v1.2.zip
     URL_HASH SHA1=2430aabb46e660941dbfa5a71805a280f13dc660
     DOWNLOAD_DIR ${SDK_DIR}/cache
     DOWNLOAD_NO_PROGRESS true
@@ -27,7 +27,7 @@ ExternalProject_Add(SymbianSDK
     "${SDK_DIR}/../cmake/stub-sdk.cmake" ${SDK_ROOT}/CMakeLists.txt)
 
 ExternalProject_Add(EKA2L1
-    URL https://archive.mupf.dev/eka2l1.zip
+    URL https://media.githubusercontent.com/media/ngagesdk/ngagesdk.github.io/master/files/eka2l1.zip
     URL_HASH SHA1=0f172f0ae5f12dffcd191065922bf66754d44504
     DOWNLOAD_DIR ${SDK_DIR}/cache
     DOWNLOAD_NO_PROGRESS true
