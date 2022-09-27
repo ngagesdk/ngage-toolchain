@@ -12,8 +12,6 @@ comprehensive system that allows the original and freely available
 Symbian S60v1 SDK to be used with modern tools such as CMake and Visual
 Studio 2022.
 
-[![VS 2022 animation](https://raw.githubusercontent.com/ngagesdk/ngage-toolchain/master/media/ngagesdk-vs-2022.gif)](https://raw.githubusercontent.com/ngagesdk/ngage-toolchain/master/media/ngagesdk-vs-2022.gif?raw=true "VS 2022 animation")
-
 This toolchain is the core of this project and provides the basis for
 all projects that build on it.
 
