@@ -19,7 +19,7 @@ set(EKA2L1_DIR         ${NGAGESDK}/sdk/eka2l1)
 set(EKA2L1_E_DRIVE     ${EKA2L1_DIR}/data/drives/e)
 
 set(CMAKE_C_COMPILER   ${EPOC_PLATFORM}/gcc/bin/gcc.exe)
-set(CMAKE_CXX_COMPILER ${EPOC_PLATFORM}/gcc/bin/gcc.exe)
+set(CMAKE_CXX_COMPILER ${EPOC_PLATFORM}/gcc/bin/g++.exe)
 set(CMAKE_OBJCOPY      ${EPOC_PLATFORM}/gcc/bin/objcopy.exe)
 set(CMAKE_OBJDUMP      ${EPOC_PLATFORM}/gcc/bin/objdump.exe)
 
