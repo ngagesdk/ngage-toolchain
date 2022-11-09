@@ -41,10 +41,10 @@ by additional libraries as needed.
 
 ## Where do I start?
 
-Clone the toolchain including all sub-modules:
+Clone the toolchain:
 
 ```bash
-git clone --recurse-submodules -j4 https://github.com/ngagesdk/ngage-toolchain.git
+git clone https://github.com/ngagesdk/ngage-toolchain.git
 ```
 
 Create the environment variable `$NGAGESDK` and set it to the
@@ -68,11 +68,6 @@ the file `cygwin1.dll`.
 
 - This project is licensed under the "The MIT License".  See the file
   [LICENSE.md](LICENSE.md) for details.
-
-- Packed file system by [Daniel
-  Monteiro](https://montyontherun.itch.io/).
-
-- genaif by [Rudolf König](http://www.koeniglich.de).
 
 - The [N-Gage SDK logo](media/) by [Dan Whelan](https://danwhelan.ie) is
   licensed under a Creative Commons [Attribution-ShareAlike 4.0
