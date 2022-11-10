@@ -60,7 +60,7 @@ project so that the necessary dependencies are downloaded and installed.
 ### Important
 
 The GCC compiler for Symbian S60 is based on Cygwin. For it to work, its
-path `%NGAGESDK%\sdk\6.1\Shared\EPOC32\gcc\bin` should be included in
+path `%NGAGESDK%\sdk\sdk\6.1\Shared\EPOC32\gcc\bin` should be included in
 your `$PATH` environment variable, otherwise it will not be able to find
 the file `cygwin1.dll`.
 
