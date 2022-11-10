@@ -4,6 +4,12 @@
 
 A toolchain for Symbian S60v1 devices such as the Nokia N-Gage.
 
+In addition to a modern build system based on CMake, the toolchain also
+includes other modern libraries in the latest version, such as:
+
+- Simple DirectMedia Layer (SDL) 2.24.2
+- Lua 5.4.4
+
 ## What is this all about?
 
 First of all, this is not a leak of the so far unreleased Nokia N-Gage
