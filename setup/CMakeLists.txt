@@ -23,6 +23,15 @@ FetchContent_Populate(
   SHA256=7fae98ac4e7b39eb2511fc27c2e84b220ac69b5296ff41f833b967c891f9d2ac
   SOURCE_DIR ${SDK_DIR}/SDL-2.24.2)
 
+FetchContent_Populate(
+  lua5
+  URL https://github.com/lua/lua/archive/refs/tags/v5.4.4.zip
+  URL_HASH
+  SHA256=9f589ca98ea102616e1c29073882b6e6e285ed3f977a0d08c34b76451a72beba
+  SOURCE_DIR ${SDK_DIR}/lua-5.4.4)
+
+file(REMOVE "${SDK_DIR}/lua-5.4.4/luaconf.h")
+
 project(setup)
 
 include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
@@ -40,7 +49,7 @@ ExternalProject_Add(apps
 
 ExternalProject_Add(extras
     URL https://media.githubusercontent.com/media/ngagesdk/ngagesdk.github.io/master/files/extras.zip
-    URL_HASH SHA1=1257ee18428a1b692ece637ee257deb08c81b174
+    URL_HASH SHA1=242dc65652c5a935fd1cef6e92b0a053a4a7c746
     DOWNLOAD_DIR ${SDK_DIR}/cache
     DOWNLOAD_NO_PROGRESS true
     TLS_VERIFY true
