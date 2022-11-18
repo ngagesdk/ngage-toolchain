@@ -9,6 +9,7 @@ includes other modern libraries in the latest version, such as:
 
 - Simple DirectMedia Layer (SDL) 2.24.2
 - Lua 5.4.4
+- [SDL2_gfx](https://github.com/mupfdev/SDL2_gfx) 1.0.6
 
 ## What is this all about?
 

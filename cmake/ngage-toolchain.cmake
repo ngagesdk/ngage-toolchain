@@ -40,6 +40,7 @@ include_directories(
   ${S60_SDK_ROOT}/Series60/Epoc32/Include/libc
   ${SDK_ROOT}/extras/include
   ${SDK_ROOT}/SDL-2.24.2/include
+  ${SDK_ROOT}/SDL2_gfx-1.0.5
   ${SDK_ROOT}/lua-5.4.4)
 
 set(DEBUG_FLAGS "-save-temps")

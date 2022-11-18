@@ -14,14 +14,22 @@ if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
   cmake_policy(SET CMP0135 NEW)
 endif()
 
-set(SDL_VERSION "2.24.2")
+set(SDL_VERSION      "2.24.2")
+set(SDL2_GFX_VERSION "1.0.6")
 
 FetchContent_Populate(
   SDL2
   URL https://github.com/libsdl-org/SDL/releases/download/release-${SDL_VERSION}/SDL2-${SDL_VERSION}.zip
   URL_HASH
   SHA256=7fae98ac4e7b39eb2511fc27c2e84b220ac69b5296ff41f833b967c891f9d2ac
-  SOURCE_DIR ${SDK_DIR}/SDL-2.24.2)
+  SOURCE_DIR ${SDK_DIR}/SDL-${SDL_VERSION})
+
+FetchContent_Populate(
+  SDL2_gfx
+  URL https://github.com/mupfdev/SDL2_gfx/archive/refs/tags/${SDL2_GFX_VERSION}.zip
+  URL_HASH
+  SHA256=c04670a2c8329d455b16302ebb0132994fcf8b4b01d65f68ebd6d6ef07bc1485
+  SOURCE_DIR ${SDK_DIR}/SDL2_gfx-${SDL2_GFX_VERSION})
 
 FetchContent_Populate(
   lua5
@@ -49,7 +57,7 @@ ExternalProject_Add(apps
 
 ExternalProject_Add(extras
     URL https://media.githubusercontent.com/media/ngagesdk/ngagesdk.github.io/master/files/extras.zip
-    URL_HASH SHA1=242dc65652c5a935fd1cef6e92b0a053a4a7c746
+    URL_HASH SHA1=c553e3be2e86db3b9c27414f7f03b928e627b958
     DOWNLOAD_DIR ${SDK_DIR}/cache
     DOWNLOAD_NO_PROGRESS true
     TLS_VERIFY true
