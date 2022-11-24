@@ -7,7 +7,7 @@ A toolchain for Symbian S60v1 devices such as the Nokia N-Gage.
 In addition to a modern build system based on CMake, the toolchain also
 includes other modern libraries in the latest version, such as:
 
-- Simple DirectMedia Layer (SDL) 2.24.2
+- Simple DirectMedia Layer (SDL) 2.26.0
 - Lua 5.4.4
 - [SDL2_gfx](https://github.com/mupfdev/SDL2_gfx) 1.0.6
 
