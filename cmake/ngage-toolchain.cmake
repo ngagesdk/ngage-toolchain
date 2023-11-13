@@ -96,6 +96,10 @@ function(build_dll source file_ext uid1 uid2 uid3 libs)
     COMMAND
     ${EPOC_PLATFORM}/gcc/bin/dlltool -m arm_interwork --output-def ${CMAKE_CURRENT_BINARY_DIR}/${source}.def ${CMAKE_CURRENT_BINARY_DIR}/lib${source}.a)
 
+  build_dll_ex("${source}" "${file_ext}" "${uid1}" "${uid2}" "${uid3}" "${libs}" "${CMAKE_CURRENT_BINARY_DIR}/${source}.def")
+endfunction()
+
+function(build_dll_ex source file_ext uid1 uid2 uid3 libs def_file)
   # Create new Export file from generated DefFle
   add_custom_target(
     ${source}_tmp.exp
@@ -103,7 +107,7 @@ function(build_dll source file_ext uid1 uid2 uid3 libs)
     DEPENDS
     ${CMAKE_CURRENT_BINARY_DIR}/${source}.def
     COMMAND
-    ${EPOC_PLATFORM}/gcc/bin/dlltool -m arm_interwork --def ${CMAKE_CURRENT_BINARY_DIR}/${source}.def --output-exp ${CMAKE_CURRENT_BINARY_DIR}/${source}_tmp.exp --dllname ${source}[${uid3}].${file_ext})
+    ${EPOC_PLATFORM}/gcc/bin/dlltool -m arm_interwork --def ${def_file} --output-exp ${CMAKE_CURRENT_BINARY_DIR}/${source}_tmp.exp --dllname ${source}[${uid3}].${file_ext})
 
   # Create new Base file
   add_custom_target(
@@ -121,7 +125,7 @@ function(build_dll source file_ext uid1 uid2 uid3 libs)
     DEPENDS
     ${CMAKE_CURRENT_BINARY_DIR}/${source}.bas
     COMMAND
-    ${EPOC_PLATFORM}/gcc/bin/dlltool -m arm_interwork --def ${CMAKE_CURRENT_BINARY_DIR}/${source}.def --dllname ${source}[${uid3}].${file_ext} --base-file ${CMAKE_CURRENT_BINARY_DIR}/${source}.bas --output-exp ${CMAKE_CURRENT_BINARY_DIR}/${source}.exp)
+    ${EPOC_PLATFORM}/gcc/bin/dlltool -m arm_interwork --def ${def_file} --dllname ${source}[${uid3}].${file_ext} --base-file ${CMAKE_CURRENT_BINARY_DIR}/${source}.bas --output-exp ${CMAKE_CURRENT_BINARY_DIR}/${source}.exp)
 
   # Create new interface LIB file with def a
   add_custom_target(
@@ -130,7 +134,7 @@ function(build_dll source file_ext uid1 uid2 uid3 libs)
     DEPENDS
     ${CMAKE_CURRENT_BINARY_DIR}/${source}.exp
     COMMAND
-    ${EPOC_PLATFORM}/gcc/bin/dlltool -m arm_interwork --def ${CMAKE_CURRENT_BINARY_DIR}/${source}.def --dllname ${source}[${uid3}].${file_ext} --base-file ${CMAKE_CURRENT_BINARY_DIR}/${source}.bas --output-lib ${CMAKE_CURRENT_BINARY_DIR}/${source}.lib)
+    ${EPOC_PLATFORM}/gcc/bin/dlltool -m arm_interwork --def ${def_file} --dllname ${source}[${uid3}].${file_ext} --base-file ${CMAKE_CURRENT_BINARY_DIR}/${source}.bas --output-lib ${CMAKE_CURRENT_BINARY_DIR}/${source}.lib)
 
   add_custom_target(
     ${source}.map
