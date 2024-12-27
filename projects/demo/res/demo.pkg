@@ -11,6 +11,6 @@
 
 ;
 "..\out\build\N-Gage\game.exe"-"E:\System\Apps\demo\game.exe"
-"..\out\build\N-Gage\launcher.app"-"E:\System\Apps\demo\demo.app"
-"..\out\build\N-Gage\launcher.rsc"-"E:\System\Apps\demo\demo.rsc"
-"..\out\build\N-Gage\launcher.aif"-"E:\System\Apps\demo\demo.aif"
+"..\out\build\N-Gage\demo.app"-"E:\System\Apps\demo\demo.app"
+"..\out\build\N-Gage\demo.rsc"-"E:\System\Apps\demo\demo.rsc"
+"..\out\build\N-Gage\demo.aif"-"E:\System\Apps\demo\demo.aif"
