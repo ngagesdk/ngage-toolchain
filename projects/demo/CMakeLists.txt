@@ -33,7 +33,7 @@ set(game_libs
     ${EPOC_LIB}/hal.lib
     ${EPOC_LIB}/efsrv.lib)
 
-set(launcher_libs
+set(demo_libs
   ${EPOC_LIB}/euser.lib
   ${EPOC_LIB}/apparc.lib
   ${EPOC_LIB}/cone.lib
@@ -43,7 +43,7 @@ set(launcher_libs
 set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(RESOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/res")
 
-set(launcher_sources
+set(demo_sources
   "${SRC_DIR}/ngage.cpp"
   "${SRC_DIR}/ngage_application.cpp"
   "${SRC_DIR}/ngage_appui.cpp"
@@ -51,20 +51,20 @@ set(launcher_sources
   "${SRC_DIR}/ngage_document.cpp")
 
 add_library(game STATIC ${project_sources})
-add_library(launcher STATIC ${launcher_sources})
+add_library(demo STATIC ${demo_sources})
 build_exe(game exe ${UID1} ${UID2} ${UID3} "${game_libs}")
-build_dll(launcher app ${UID1} ${UID2} ${APP_UID} "${launcher_libs}")
+build_dll(demo app ${UID1} ${UID2} ${APP_UID} "${demo_libs}")
 
-build_aif(${RESOURCE_DIR} launcher ${APP_UID})
-build_resource(${RESOURCE_DIR} launcher "")
-build_sis(${RESOURCE_DIR} launcher)
+build_aif(${RESOURCE_DIR} demo ${APP_UID})
+build_resource(${RESOURCE_DIR} demo "")
+build_sis(${RESOURCE_DIR} demo)
 
 add_dependencies(
-    launcher.sis
+    demo.sis
     game.exe
-    launcher.aif
-    launcher.app
-    launcher.rsc)
+    demo.aif
+    demo.app
+    demo.rsc)
 
 add_dependencies(
     game.exe
@@ -91,11 +91,11 @@ target_include_directories(
     ${SRC_DIR})
 
 add_dependencies(
-  launcher.app
-  launcher)
+  demo.app
+  demo)
 
 target_compile_definitions(
-  launcher
+  demo
   PUBLIC
   __DLL__
   APP_NAME=${APP_NAME}
@@ -105,11 +105,11 @@ target_compile_definitions(
   UID3=${APP_UID})
 
 target_compile_options(
-  launcher
+  demo
   PUBLIC
   -O3)
 
 target_include_directories(
-  launcher
+  demo
   PUBLIC
   ${SRC_DIR})
