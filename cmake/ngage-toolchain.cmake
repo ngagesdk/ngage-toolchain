@@ -14,7 +14,7 @@ set(EPOC_PLATFORM      ${S60_SDK_ROOT}/Shared/EPOC32)
 set(EPOC_LIB           ${S60_SDK_ROOT}/Series60/Epoc32/Release/armi/urel)
 set(EXTRA_LIB          ${SDK_ROOT}/extras/lib)
 
-set(CMAKE_C_COMPILER   ${EPOC_PLATFORM}/gcc/bin/gcc.exe)
+set(CMAKE_C_COMPILER   ${EPOC_PLATFORM}/ngagesdk/bin/arm-epoc-pe-gcc.exe)
 set(CMAKE_CXX_COMPILER ${EPOC_PLATFORM}/gcc/bin/g++.exe)
 set(CMAKE_OBJCOPY      ${EPOC_PLATFORM}/gcc/bin/objcopy.exe)
 set(CMAKE_OBJDUMP      ${EPOC_PLATFORM}/gcc/bin/objdump.exe)
@@ -31,22 +31,20 @@ set(CMAKE_CXX_COMPILER_FORCED TRUE)
 set(CMAKE_CXX_COMPILER_WORKS  TRUE)
 
 add_compile_definitions(
-  __NGAGE__=1)
+    __NGAGE__=1)
 
 include_directories(
-  SYSTEM
-  ${EPOC_PLATFORM}/include
-  ${S60_SDK_ROOT}/Series60/Epoc32/Include
-  ${S60_SDK_ROOT}/Series60/Epoc32/Include/libc
-  ${SDK_ROOT}/extras/include
-  ${SDK_ROOT}/SDL-2.24.2/include
-  ${SDK_ROOT}/SDL2_gfx-1.0.6
-  ${SDK_ROOT}/lua-5.4.4)
+    SYSTEM
+    ${EPOC_PLATFORM}/include
+    ${S60_SDK_ROOT}/Series60/Epoc32/Include
+    ${S60_SDK_ROOT}/Series60/Epoc32/Include/libc
+    ${SDK_ROOT}/extras/include)
 
 set(DEBUG_FLAGS "-save-temps")
-set(CORE_FLAGS  "-s -fomit-frame-pointer -O -march=armv4t -mthumb-interwork -pipe -nostdinc -Wall -Wno-ctor-dtor-privacy -Wno-unknown-pragmas -Wno-switch -mstructure-size-boundary=8")
+set(CORE_FLAGS  "-s -fomit-frame-pointer -O -mthumb-interwork -pipe -nostdinc -Wall -Wno-unknown-pragmas -Wno-switch -mstructure-size-boundary=8")
 
-set(CMAKE_CXX_FLAGS ${CORE_FLAGS} CACHE INTERNAL "cxx compiler flags")
+set(CMAKE_C_FLAGS "${CORE_FLAGS} -std=c99 -fno-leading-underscore" CACHE STRING "C compiler flags")
+set(CMAKE_CXX_FLAGS ${CORE_FLAGS} -march=armv4t -Wno-ctor-dtor-privacy CACHE STRING "cxx compiler flags")
 
 function(build_exe_static source file_ext uid1 uid2 uid3 static_libs libs)
   add_custom_target(
