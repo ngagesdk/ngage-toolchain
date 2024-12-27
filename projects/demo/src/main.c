@@ -1,3 +1,12 @@
+/* @file main.c
+ *
+ * Nokia N-Gage toolchain demo application.
+ *
+ * CC0 http://creativecommons.org/publicdomain/zero/1.0/
+ * SPDX-License-Identifier: CC0-1.0
+ *
+ */
+
 #include <stdlib.h>
 #include <stdio.h>
 
