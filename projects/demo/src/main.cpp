@@ -1,3 +1,12 @@
+/* @file main.cpp
+ *
+ * Nokia N-Gage toolchain demo application.
+ *
+ * CC0 http://creativecommons.org/publicdomain/zero/1.0/
+ * SPDX-License-Identifier: CC0-1.0
+ *
+ */
+
 #include <e32std.h>
 #include <e32def.h>
 #include <e32svr.h>
