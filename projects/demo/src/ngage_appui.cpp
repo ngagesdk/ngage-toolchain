@@ -30,9 +30,11 @@ CNGageAppUi::CNGageAppUi()
 
     if (KErrNone == Proc.Create(_L("E:\\System\\Apps\\demo\\game.exe"), _L("")))
     {
+        TRequestStatus status;
+        Proc.Logon(status);
         Proc.Resume();
+        User::WaitForRequest(status);
         Proc.Close();
-        User::After(10000000);
         Exit();
     }
     else
