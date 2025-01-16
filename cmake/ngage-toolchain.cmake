@@ -37,11 +37,10 @@ include_directories(
     SYSTEM
     ${EPOC_PLATFORM}/include
     ${S60_SDK_ROOT}/Series60/Epoc32/Include
-    ${S60_SDK_ROOT}/Series60/Epoc32/Include/libc
-    ${SDK_ROOT}/extras/include)
+    ${S60_SDK_ROOT}/Series60/Epoc32/Include/libc)
 
 set(DEBUG_FLAGS "-save-temps")
-set(CORE_FLAGS "-s -fomit-frame-pointer -O -mthumb-interwork -pipe -nostdinc -Wall -Wno-unknown-pragmas -Wno-switch -mstructure-size-boundary=8")
+set(CORE_FLAGS "-s -fomit-frame-pointer -O2 -mthumb-interwork -pipe -nostdinc -Wall -Wno-unknown-pragmas -Wno-switch -mstructure-size-boundary=8")
 
 set(CMAKE_C_FLAGS "${CORE_FLAGS} -std=c99 -fno-leading-underscore" CACHE STRING "C compiler flags")
 set(CMAKE_CXX_FLAGS ${CORE_FLAGS} -march=armv4t -Wno-ctor-dtor-privacy CACHE STRING "cxx compiler flags")
