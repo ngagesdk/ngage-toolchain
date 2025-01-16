@@ -31,7 +31,7 @@ ExternalProject_Add(apps
 
 ExternalProject_Add(sdk
     URL https://media.githubusercontent.com/media/ngagesdk/ngagesdk.github.io/master/files/sdk.zip
-    URL_HASH SHA1=d3047102c041a2f9d408e04e9eb400fd66433f5f
+    URL_HASH SHA1=377979de77ad7cd190b0154fae2d581d6caab852
     DOWNLOAD_DIR ${SDK_DIR}/cache
     DOWNLOAD_NO_PROGRESS true
     TLS_VERIFY true
