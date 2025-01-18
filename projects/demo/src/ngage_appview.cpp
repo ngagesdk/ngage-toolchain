@@ -46,7 +46,7 @@ void CNGageAppView::ConstructL(const TRect& aRect)
 void CNGageAppView::Draw(const TRect& /*aRect*/) const
 {
     CWindowGc& gc = SystemGc();
-    TRect      rect = Rect();
+    TRect rect = Rect();
 
     gc.Clear(rect);
 }

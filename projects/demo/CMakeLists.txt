@@ -24,14 +24,25 @@ set(GCC_COMN_DEFS -D__SYMBIAN32__ -D__GCC32__ -D__EPOC32__ -D__MARM__ -D__MARM_A
 set(GCC_MODE_DEFS -DNDEBUG -D_UNICODE)
 set(GCC_DEFS ${GCC_COMN_DEFS} ${GCC_MODE_DEFS})
 
+set(game_static_libs
+    ${CMAKE_CURRENT_SOURCE_DIR}/lib/libSDL3.a)
+
 set(game_libs
+    ${EPOC_LIB}/NRenderer.lib
+    ${EPOC_LIB}/3dtypes.a
+    ${EPOC_LIB}/cone.lib
     ${EPOC_PLATFORM}/gcc/lib/gcc-lib/arm-epoc-pe/2.9-psion-98r2/libgcc.a
-    ${EPOC_LIB}/egcc.lib
+    ${EPOC_PLATFORM}/ngagesdk/lib/gcc/arm-epoc-pe/4.6.4/libgcc_ngage.a
+    ${EPOC_LIB}/mediaclientaudio.lib
+    ${EPOC_LIB}/bitgdi.lib
     ${EPOC_LIB}/euser.lib
     ${EPOC_LIB}/estlib.lib
     ${EPOC_LIB}/ws32.lib
     ${EPOC_LIB}/hal.lib
-    ${EPOC_LIB}/efsrv.lib)
+    ${EPOC_LIB}/fbscli.lib
+    ${EPOC_LIB}/efsrv.lib
+    ${EPOC_LIB}/scdv.lib
+    ${EPOC_LIB}/gdi.lib)
 
 set(demo_libs
   ${EPOC_LIB}/euser.lib
@@ -52,19 +63,19 @@ set(demo_sources
 
 add_library(game STATIC ${project_sources})
 add_library(demo STATIC ${demo_sources})
-build_exe(game exe ${UID1} ${UID2} ${UID3} "${game_libs}")
+build_exe_static(game exe ${UID1} ${UID2} ${UID3} "${game_static_libs}" "${game_libs}")
 build_dll(demo app ${UID1} ${UID2} ${APP_UID} "${demo_libs}")
 
 build_aif(${RESOURCE_DIR} demo ${APP_UID})
 build_resource(${RESOURCE_DIR} demo "")
-build_sis(${RESOURCE_DIR} demo)
-
-add_dependencies(
-    demo.sis
-    game.exe
-    demo.aif
-    demo.app
-    demo.rsc)
+#build_sis(${RESOURCE_DIR} demo)
+#
+#add_dependencies(
+#    demo.sis
+#    game.exe
+#    demo.aif
+#    demo.app
+#    demo.rsc)
 
 add_dependencies(
     game.exe
@@ -83,12 +94,13 @@ target_compile_definitions(
 target_compile_options(
     game
     PUBLIC
-    -O3)
+    -O2)
 
 target_include_directories(
     game
     PUBLIC
-    ${SRC_DIR})
+    ${SRC_DIR}
+    ${SRC_DIR}/SDL3)
 
 add_dependencies(
   demo.app
