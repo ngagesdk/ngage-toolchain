@@ -20,7 +20,6 @@ static float prev_angle;
 static float angle;
 static SDL_FlipMode prev_flip;
 static SDL_FlipMode flip;
-static bool rotate;
 
 // This function runs once at startup.
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
@@ -94,9 +93,6 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
         {
             switch (event->key.key)
             {
-                case SDLK_5:
-                    rotate = true;
-                    break;
                 case SDLK_7:
                     flip = flip + 1;
                     if (flip > SDL_FLIP_VERTICAL)
@@ -123,34 +119,12 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
             }
             break;
         }
-        case SDL_EVENT_KEY_UP:
-        {
-            switch (event->key.key)
-            {
-                case SDLK_5:
-                    rotate = false;
-                    break;
-                default:
-                    return SDL_APP_CONTINUE;
-            }
-            break;
-        }
-
     }
 }
 
 // This function runs once per frame, and is the heart of the program.
 SDL_AppResult SDL_AppIterate(void *appstate)
 {
-    if (rotate)
-    {
-        angle += 4.5f;
-        if (angle >= 360.f)
-        {
-            angle = 0.f;
-        }
-    }
-
     if (angle != prev_angle || flip != prev_flip)
     {
         SDL_RenderClear(renderer);
