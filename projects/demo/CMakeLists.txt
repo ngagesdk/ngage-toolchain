@@ -33,7 +33,8 @@ set(game_libs
     ${EPOC_LIB}/cone.lib
     ${EPOC_PLATFORM}/gcc/lib/gcc-lib/arm-epoc-pe/2.9-psion-98r2/libgcc.a
     ${EPOC_PLATFORM}/ngagesdk/lib/gcc/arm-epoc-pe/4.6.4/libgcc_ngage.a
-    ${EPOC_LIB}/mediaclientaudio.lib
+    ${EPOC_LIB}/mediaclientaudiostream.lib
+    ${EPOC_LIB}/charconv.lib
     ${EPOC_LIB}/bitgdi.lib
     ${EPOC_LIB}/euser.lib
     ${EPOC_LIB}/estlib.lib
@@ -68,14 +69,14 @@ build_dll(demo app ${UID1} ${UID2} ${APP_UID} "${demo_libs}")
 
 build_aif(${RESOURCE_DIR} demo ${APP_UID})
 build_resource(${RESOURCE_DIR} demo "")
-#build_sis(${RESOURCE_DIR} demo)
-#
-#add_dependencies(
-#    demo.sis
-#    game.exe
-#    demo.aif
-#    demo.app
-#    demo.rsc)
+build_sis(${RESOURCE_DIR} demo)
+
+add_dependencies(
+    demo.sis
+    game.exe
+    demo.aif
+    demo.app
+    demo.rsc)
 
 add_dependencies(
     game.exe
