@@ -218,7 +218,7 @@ void Flip(SDL_Surface* screen)
     SDL_FRect dest   = { 24, 40, 128, 128 };
 
     SDL_UpdateTexture(SDL_screen_tex, NULL, screen->pixels, screen->pitch);
-    SDL_SetRenderDrawColor(renderer, 0x2f, 0x2f, 0x4f, 255);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderTexture(renderer, SDL_screen_tex, &source, &dest);
     SDL_RenderPresent(renderer);
 }

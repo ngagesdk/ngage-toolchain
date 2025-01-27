@@ -114,6 +114,9 @@ skip_load:
 
     Celeste_P8_init();
 
+    SDL_SetRenderDrawColor(renderer, 0x2f, 0x2f, 0x4f, 255);
+    SDL_RenderClear(renderer);
+
     return SDL_APP_CONTINUE;
 }
 
