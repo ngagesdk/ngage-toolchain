@@ -45,7 +45,7 @@ set(game_libs
     ${EPOC_LIB}/scdv.lib
     ${EPOC_LIB}/gdi.lib)
 
-set(demo_libs
+set(celeste_libs
   ${EPOC_LIB}/euser.lib
   ${EPOC_LIB}/apparc.lib
   ${EPOC_LIB}/cone.lib
@@ -55,7 +55,7 @@ set(demo_libs
 set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(RESOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/res")
 
-set(demo_sources
+set(celeste_sources
   "${SRC_DIR}/ngage.cpp"
   "${SRC_DIR}/ngage_application.cpp"
   "${SRC_DIR}/ngage_appui.cpp"
@@ -63,20 +63,20 @@ set(demo_sources
   "${SRC_DIR}/ngage_document.cpp")
 
 add_library(game STATIC ${project_sources})
-add_library(demo STATIC ${demo_sources})
+add_library(celeste STATIC ${celeste_sources})
 build_exe_static(game exe ${UID1} ${UID2} ${UID3} "${game_static_libs}" "${game_libs}")
-build_dll(demo app ${UID1} ${UID2} ${APP_UID} "${demo_libs}")
+build_dll(celeste app ${UID1} ${UID2} ${APP_UID} "${celeste_libs}")
 
-build_aif(${RESOURCE_DIR} demo ${APP_UID})
-build_resource(${RESOURCE_DIR} demo "")
-build_sis(${RESOURCE_DIR} demo)
+build_aif(${RESOURCE_DIR} celeste ${APP_UID})
+build_resource(${RESOURCE_DIR} celeste "")
+build_sis(${RESOURCE_DIR} celeste)
 
 add_dependencies(
-    demo.sis
+    celeste.sis
     game.exe
-    demo.aif
-    demo.app
-    demo.rsc)
+    celeste.aif
+    celeste.app
+    celeste.rsc)
 
 add_dependencies(
     game.exe
@@ -104,11 +104,11 @@ target_include_directories(
     ${SRC_DIR}/SDL3)
 
 add_dependencies(
-  demo.app
-  demo)
+  celeste.app
+  celeste)
 
 target_compile_definitions(
-  demo
+  celeste
   PUBLIC
   __DLL__
   APP_NAME=${APP_NAME}
@@ -118,11 +118,11 @@ target_compile_definitions(
   UID3=${APP_UID})
 
 target_compile_options(
-  demo
+  celeste
   PUBLIC
   -O3)
 
 target_include_directories(
-  demo
+  celeste
   PUBLIC
   ${SRC_DIR})
