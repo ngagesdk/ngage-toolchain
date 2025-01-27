@@ -16,7 +16,6 @@
 #include "celeste_SDL3.h"
 
 static SDL_Window *window;
-
 static bool paused = false;
 static void* initial_game_state = NULL;
 

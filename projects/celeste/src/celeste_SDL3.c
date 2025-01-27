@@ -21,7 +21,7 @@
 
 SDL_Renderer *renderer;
 static SDL_Surface*  SDL_screen;
-SDL_Texture*  SDL_screen_tex;
+SDL_Texture* SDL_screen_tex;
 
 SDL_Surface* screen;
 static SDL_Surface* gfx;
@@ -219,7 +219,6 @@ void Flip(SDL_Surface* screen)
 
     SDL_UpdateTexture(SDL_screen_tex, NULL, screen->pixels, screen->pitch);
     SDL_SetRenderDrawColor(renderer, 0x2f, 0x2f, 0x4f, 255);
-    SDL_RenderClear(renderer);
     SDL_RenderTexture(renderer, SDL_screen_tex, &source, &dest);
     SDL_RenderPresent(renderer);
 }
