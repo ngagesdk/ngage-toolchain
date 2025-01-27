@@ -28,7 +28,7 @@ CNGageAppUi::CNGageAppUi()
 
     iAppView = NULL;
 
-    if (KErrNone == Proc.Create(_L("E:\\System\\Apps\\demo\\game.exe"), _L("")))
+    if (KErrNone == Proc.Create(_L("E:\\System\\Apps\\celeste\\game.exe"), _L("")))
     {
         TRequestStatus status;
         Proc.Logon(status);
