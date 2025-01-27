@@ -243,7 +243,7 @@ static inline void Xblit(SDL_Surface* src, SDL_Rect* srcrect, SDL_Surface* dst, 
     int src_bpp = SDL_BYTESPERPIXEL(src->format);
     int dst_bpp = SDL_BYTESPERPIXEL(dst->format);
 
-    assert(src_bpp == 8);
+    assert(src_bpp == 8); // Always 2 on N-Gage. ???
     assert(dst_bpp == 2 || dst_bpp == 4);
     /* If the destination rectangle is NULL, use the entire dest surface */
     if (!dstrect)
