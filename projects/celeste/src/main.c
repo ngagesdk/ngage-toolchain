@@ -228,6 +228,7 @@ static void Flip(SDL_Surface* screen)
 
     SDL_UpdateTexture(SDL_screen_tex, NULL, screen->pixels, screen->pitch);
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
     SDL_RenderTexture(renderer, SDL_screen_tex, &source, &dest);
     SDL_RenderPresent(renderer);
 }
@@ -260,7 +261,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     }
 
     SDL_PixelFormat format = SDL_GetWindowPixelFormat(window);
-    SDL_screen_tex = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_STREAMING, NGAGE_W, NGAGE_H);
+    SDL_screen_tex = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_STREAMING, PICO8_W, PICO8_H);
     if (!SDL_screen_tex)
     {
         SDL_Log("Couldn't create screen texture: %s", SDL_GetError());
@@ -340,6 +341,32 @@ skip_load:
 // This function runs when a new event (Keypresses, etc) occurs.
 SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 {
+    //const bool* kbstate = SDL_GetKeyboardState(NULL);
+    static int reset_input_timer  = 0;
+    Uint16 prev_buttons_state = buttons_state;
+
+    //if (initial_game_state != NULL)
+    //{
+    //    reset_input_timer++;
+    //    if (reset_input_timer >= 30)
+    //    {
+    //        reset_input_timer=0;
+    //        //reset
+    //        OSDset("reset");
+    //        paused = 0;
+    //        Celeste_P8_load_state(initial_game_state);
+    //        Celeste_P8_set_rndseed((unsigned)(time(NULL) + SDL_GetTicks()));
+    //        Celeste_P8_init();
+    //    }
+    //}
+    //else
+    //{
+    //    reset_input_timer = 0;
+    //}
+
+    prev_buttons_state = buttons_state;
+    buttons_state = 0;
+
     switch (event->type)
     {
         case SDL_EVENT_KEY_DOWN:
@@ -366,27 +393,6 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 // This function runs once per frame, and is the heart of the program.
 SDL_AppResult SDL_AppIterate(void *appstate)
 {
-    static int reset_input_timer = 0;
-
-    if (initial_game_state != NULL)
-    {
-        reset_input_timer++;
-        if (reset_input_timer >= 30)
-        {
-            reset_input_timer=0;
-            //reset
-            OSDset("reset");
-            paused = 0;
-            Celeste_P8_load_state(initial_game_state);
-            Celeste_P8_set_rndseed((unsigned)(time(NULL) + SDL_GetTicks()));
-            Celeste_P8_init();
-        }
-    }
-    else
-    {
-        reset_input_timer = 0;
-    }
-
     if (paused)
     {
         const int x0 = PICO8_W/2-3*4, y0 = 8;
@@ -428,8 +434,12 @@ static inline void Xblit(SDL_Surface* src, SDL_Rect* srcrect, SDL_Surface* dst, 
     int srcx, srcy, w, h;
 
     assert(src && dst && !src->locked && !dst->locked);
-    //assert(src->format->BitsPerPixel == 8);
-    //assert(dst->format->BytesPerPixel == 2 || dst->format->BytesPerPixel == 4);
+
+    int src_bpp = SDL_BYTESPERPIXEL(src->format);
+    int dst_bpp = SDL_BYTESPERPIXEL(dst->format);
+
+    assert(src_bpp == 8);
+    assert(dst_bpp == 2 || dst_bpp == 4);
     /* If the destination rectangle is NULL, use the entire dest surface */
     if (!dstrect)
     {
