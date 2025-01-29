@@ -10,26 +10,16 @@
  *
  */
 
-#include <SDL3/SDL.h>
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-
+#include "SDL3/SDL.h"
 #include "celeste_SDL3.h"
 #include "celeste.h"
+#include "tilemap.h"
 
-SDL_Renderer *renderer;
-static SDL_Surface*  SDL_screen;
-SDL_Texture* SDL_screen_tex;
+static SDL_Surface* screen = NULL;
+static SDL_Surface* gfx = NULL;
+static SDL_Surface* font = NULL;
 
-SDL_Surface* screen;
-static SDL_Surface* gfx;
-static SDL_Surface* font;
-
-static int scale = 1;
-
-static const SDL_Color base_palette[16] =
+static const SDL_Color base_palette_colors[16] =
 {
     { 0x00, 0x00, 0x00 },
     { 0x1d, 0x2b, 0x53 },
@@ -49,125 +39,36 @@ static const SDL_Color base_palette[16] =
     { 0xff, 0xcc, 0xaa }
 };
 
-static SDL_Color palette[16];
+static SDL_Color palette_colors[16];
+static SDL_Palette palette;
 static Uint32 map[16];
 
-static void SetPaletteEntry(unsigned char idx, unsigned char base_idx)
-{
-    palette[idx] = base_palette[base_idx];
+#define getcolor(col) map[col % 16]
 
-    const SDL_PixelFormatDetails* details = SDL_GetPixelFormatDetails(screen->format);
-    map[idx] = SDL_MapRGB(details, NULL, palette[idx].r, palette[idx].g, palette[idx].b);
-}
+static _Bool enable_screenshake = 1;
+static Uint16 buttons_state = 0;
 
-static void RefreshPalette(void)
-{
-    int i;
-    const SDL_PixelFormatDetails* details = SDL_GetPixelFormatDetails(screen->format);
+static Uint32 getpixel(SDL_Surface* surface, int x, int y);
+static int gettileflag(int tile, int flag);
+static void loadbmpscale(char* filename, SDL_Surface** s);
 
-    for (i = 0; i < SDL_arraysize(map); i++)
-    {
-        map[i] = SDL_MapRGB(details, NULL, palette[i].r, palette[i].g, palette[i].b);
-    }
-}
+static void SetPaletteEntry(unsigned char idx, unsigned char base_idx);
 
-void ResetPalette(void)
-{
-    SDL_memcpy(palette, base_palette, sizeof palette);
-    RefreshPalette();
-}
-
-static Uint32 getpixel(SDL_Surface *surface, int x, int y)
-{
-    int bpp = SDL_BYTESPERPIXEL(surface->format);
-    /* Here p is the address to the pixel we want to retrieve */
-    Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
-
-    switch(bpp)
-    {
-        case 1:
-            return *p;
-        case 2:
-            return *(Uint16 *)p;
-        case 3:
-            if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
-            {
-                return p[0] << 16 | p[1] << 8 | p[2];
-            }
-            else
-            {
-                return p[0] | p[1] << 8 | p[2] << 16;
-            }
-        case 4:
-            return *(Uint32 *)p;
-        default:
-            return 0;
-    }
-}
-
-static void loadbmpscale(char* filename, SDL_Surface** s)
-{
-    SDL_Surface* surf = *s;
-    SDL_Surface* bmp;
-    SDL_Palette pal;
-    int w, h;
-    unsigned char* data;
-    int y;
-    char file_path[256];
-
-    if (surf)
-    {
-        SDL_DestroySurface(surf), surf = *s = NULL;
-    }
-
-    SDL_snprintf(file_path, sizeof(file_path), "%s%s", SDL_GetBasePath(), filename);
-    bmp = SDL_LoadBMP(file_path);
-    if (! bmp)
-    {
-        SDL_Log("error loading bmp '%s': %s\n", filename, SDL_GetError());
-        return;
-    }
-
-    w = bmp->w;
-    h = bmp->h;
-
-    surf = SDL_CreateSurface(w*scale, h*scale, screen->format);
-    assert(surf != NULL);
-    data = surf->pixels;
-
-    for (y = 0; y < h; y++)
-    {
-        int x;
-        for (x = 0; x < w; x++)
-        {
-            unsigned char pix = getpixel(bmp, x, y);
-            int i;
-            for (i = 0; i < scale; i++)
-            {
-                int j;
-                for (j = 0; j < scale; j++)
-                {
-                    data[x*scale+i + (y*scale+j)*w*scale] = pix;
-                }
-            }
-        }
-    }
-    SDL_DestroySurface(bmp);
-
-    pal.colors = (SDL_Color*)base_palette;
-    pal.ncolors = 16;
-
-    SDL_SetSurfacePalette(surf, &pal);
-    SDL_SetSurfaceColorKey(surf, true, 0);
-
-    *s = surf;
-}
+static void p8_line(int x0, int y0, int x1, int y1, unsigned char color);
+static void p8_print(const char* str, int x, int y, int col);
+static void p8_rectfill(int x0, int y0, int x1, int y1, int col);
+static inline void Xblit(SDL_Surface* src, SDL_Rect* srcrect, SDL_Surface* dst, SDL_Rect* dstrect, int color, int flipx, int flipy);
 
 #define LOGLOAD(w) SDL_Log("loading %s...", w)
 #define LOGDONE() SDL_Log("done")
 
 void LoadData(void)
 {
+#if CELESTE_P8_ENABLE_AUDIO
+    static const char sndids[] = { 0,1,2,3,4,5,6,7,8,9,13,14,15,16,23,35,37,38,40,50,51,54,55 };
+    static const char musids[] = { 0,10,20,30,40 };
+    int iid;
+#endif
     LOGLOAD("gfx.bmp");
     loadbmpscale("gfx.bmp", &gfx);
     LOGDONE();
@@ -175,248 +76,62 @@ void LoadData(void)
     LOGLOAD("font.bmp");
     loadbmpscale("font.bmp", &font);
     LOGDONE();
+
+#if CELESTE_P8_ENABLE_AUDIO
+    for (iid = 0; iid < sizeof sndids; iid++)
+    {
+        int  id = sndids[iid];
+        char fname[20];
+        char path[256];
+
+        SDL_snprintf(fname, 20, "snd%i.wav", id);
+        LOGLOAD(fname);
+        SDL_snprintf("%s%s", SDL_GetBasePath(), fname);
+        snd[id] = Mix_LoadWAV(path);
+        if (!snd[id])
+        {
+            ErrLog("snd%i: Mix_LoadWAV: %s\n", id, Mix_GetError());
+        }
+        LOGDONE();
+    }
+
+    for (iid = 0; iid < sizeof musids; iid++)
+    {
+        int  id = musids[iid];
+        char fname[20];
+        char path[256];
+
+        SDL_snprintf(fname, 20, "mus%i.ogg", id);
+        LOGLOAD(fname);
+        SDL_snprintf("%s%s", SDL_GetBasePath(), fname);
+        mus[id / 10] = Mix_LoadMUS(path);
+        if (!mus[id / 10])
+        {
+            ErrLog("mus%i: Mix_LoadMUS: %s\n", id, Mix_GetError());
+        }
+        LOGDONE();
+    }
+#endif
 }
 
-#include "tilemap.h"
-
-Uint16 buttons_state = 0;
-
-static char osd_text[200] = "";
-static int  osd_timer = 0;
-
-static void OSDset(const char* fmt, ...)
+static void SetPaletteEntry(unsigned char idx, unsigned char base_idx)
 {
-    va_list ap;
-    va_start(ap, fmt);
-    SDL_vsnprintf(osd_text, sizeof osd_text, fmt, ap);
-    osd_text[sizeof osd_text - 1] = '\0'; //make sure to add NUL terminator in case of truncation
-    SDL_Log("%s", osd_text);
-    osd_timer = 30;
-    va_end(ap);
+    palette_colors[idx] = base_palette_colors[base_idx];
+    map[idx] = SDL_MapSurfaceRGB(screen, palette_colors[idx].r, palette_colors[idx].g, palette_colors[idx].b);
 }
 
-void OSDdraw(void)
+void RefreshPalette(void)
 {
-    if (osd_timer > 0)
+    for (int i = 0; i < SDL_arraysize(map); i++)
     {
-        --osd_timer;
-    }
-
-    if (osd_timer > 0)
-    {
-        const int x = 4;
-        const int y = 120 + (osd_timer < 10 ? 10-osd_timer : 0); //disappear by going below the screen
-        p8_rectfill(x-2, y-2, x+4*(int)SDL_strlen(osd_text), y+6, 6); //outline
-        p8_rectfill(x-1, y-1, x+4*(int)SDL_strlen(osd_text)-1, y+5, 0);
-        p8_print(osd_text, x, y, 7);
-    }
-}
-
-void Flip(SDL_Surface* screen)
-{
-    SDL_FRect source = { 0, 0, 128, 128 };
-    SDL_FRect dest   = { 24, 40, 128, 128 };
-
-    SDL_UpdateTexture(SDL_screen_tex, NULL, screen->pixels, screen->pitch);
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderTexture(renderer, SDL_screen_tex, &source, &dest);
-    SDL_RenderPresent(renderer);
-}
-
-static bool enable_screenshake = true;
-static bool running = true;
-static void* game_state = NULL;
-FILE* TAS = NULL;
-
-static int gettileflag(int tile, int flag);
-static void p8_line(int x0, int y0, int x1, int y1, unsigned char color);
-
-//lots of code from https://github.com/SDL-mirror/SDL/blob/bc59d0d4a2c814900a506d097a381077b9310509/src/video/SDL_surface.c#L625
-//coordinates should be scaled already
-static inline void Xblit(SDL_Surface* src, SDL_Rect* srcrect, SDL_Surface* dst, SDL_Rect* dstrect, int color, int flipx, int flipy)
-{
-    SDL_Rect fulldst;
-    int srcx, srcy, w, h;
-
-    assert(src && dst && !src->locked && !dst->locked);
-
-    int src_bpp = SDL_BYTESPERPIXEL(src->format);
-    int dst_bpp = SDL_BYTESPERPIXEL(dst->format);
-
-    assert(src_bpp == 8); // Always 2 on N-Gage. ???
-    assert(dst_bpp == 2 || dst_bpp == 4);
-    /* If the destination rectangle is NULL, use the entire dest surface */
-    if (!dstrect)
-    {
-        dstrect = (fulldst = (SDL_Rect){ 0,0,dst->w,dst->h }, &fulldst);
-    }
-
-    /* clip the source rectangle to the source surface */
-    if (srcrect)
-    {
-        int maxw, maxh;
-
-        srcx = srcrect->x;
-        w = srcrect->w;
-        if (srcx < 0)
-        {
-            w += srcx;
-            dstrect->x -= srcx;
-            srcx = 0;
-        }
-        maxw = src->w - srcx;
-        if (maxw < w)
-        {
-            w = maxw;
-        }
-
-        srcy = srcrect->y;
-        h = srcrect->h;
-        if (srcy < 0)
-        {
-            h += srcy;
-            dstrect->y -= srcy;
-            srcy = 0;
-        }
-        maxh = src->h - srcy;
-        if (maxh < h)
-        {
-            h = maxh;
-        }
-
-    }
-    else
-    {
-        srcx = srcy = 0;
-        w = src->w;
-        h = src->h;
-    }
-
-    /* clip the destination rectangle against the clip rectangle */
-    {
-        SDL_Rect clip;
-        clip.x = 0;
-        clip.y = 0;
-        clip.w = dst->w;
-        clip.h = dst->h;
-
-        int dx, dy;
-
-        dx = clip.x - dstrect->x;
-        if (dx > 0)
-        {
-            w -= dx;
-            dstrect->x += dx;
-            srcx += dx;
-        }
-        dx = dstrect->x + w - clip.x - clip.w;
-        if (dx > 0)
-        {
-            w -= dx;
-        }
-
-        dy = clip.y - dstrect->y;
-        if (dy > 0)
-        {
-            h -= dy;
-            dstrect->y += dy;
-            srcy += dy;
-        }
-        dy = dstrect->y + h - clip.y - clip.h;
-        if (dy > 0)
-        {
-            h -= dy;
-        }
-    }
-
-    if (w && h)
-    {
-        unsigned char* srcpix = src->pixels;
-        int srcpitch = src->pitch;
-        int x, y;
-
-#define _blitter(dsttype, dp, xflip) do { \
-            dsttype* dstpix = dst->pixels; \
-            for (y = 0; y < h; y++) \
-            { \
-                for (x = 0; x < w; x++) \
-                { \
-                    unsigned char p = srcpix[!xflip ? srcx+x+(srcy+y)*srcpitch : srcx+(w-x-1)+(srcy+y)*srcpitch]; \
-                    if (p) dstpix[dstrect->x+x + (dstrect->y+y)*dst->w] = getcolor(dp); \
-                } \
-            } \
-            } while(0)
-
-        int screen_bpp = SDL_BYTESPERPIXEL(screen->format);
-        if (screen_bpp == 2 && color && flipx)
-        {
-            _blitter(Uint16, color, 1);
-        }
-        else if (screen_bpp == 2 && !color && flipx)
-        {
-            _blitter(Uint16, p, 1);
-        }
-        else if (screen_bpp == 2 && color && !flipx)
-        {
-            _blitter(Uint16, color, 0);
-        }
-        else if (screen_bpp == 2 && !color && !flipx)
-        {
-            _blitter(Uint16, p, 0);
-        }
-        else if (screen_bpp == 4 && color && flipx)
-        {
-            _blitter(Uint32, color, 1);
-        }
-        else if (screen_bpp == 4 && !color && flipx)
-        {
-            _blitter(Uint32, p, 1);
-        }
-        else if (screen_bpp == 4 && color && !flipx)
-        {
-            _blitter(Uint32, color, 0);
-        }
-        else if (screen_bpp == 4 && !color && !flipx)
-        {
-            _blitter(Uint32, p, 0);
-        }
-#undef _blitter
+        map[i] = SDL_MapSurfaceRGB(screen, palette_colors[i].r, palette_colors[i].g, palette_colors[i].b);
     }
 }
 
-void p8_rectfill(int x0, int y0, int x1, int y1, int col)
+void ResetPalette(void)
 {
-    int w = (x1 - x0 + 1) * scale;
-    int h = (y1 - y0 + 1) * scale;
-    if (w > 0 && h > 0)
-    {
-        SDL_Rect rc = { x0 * scale,y0 * scale, w,h };
-        SDL_FillSurfaceRect(screen, &rc, getcolor(col));
-    }
-}
-
-void p8_print(const char* str, int x, int y, int col)
-{
-    char c;
-    for (c = *str; c; c = *(++str))
-    {
-        SDL_Rect srcrc;
-        SDL_Rect dstrc;
-        c &= 0x7F;
-        srcrc.x = 8 * (c % 16);
-        srcrc.y = 8 * (c / 16);
-        srcrc.x *= scale;
-        srcrc.y *= scale;
-        srcrc.w = srcrc.h = 8 * scale;
-
-        dstrc.x = x * scale;
-        dstrc.y = y * scale;
-        dstrc.w = scale;
-        dstrc.h = scale;
-
-        Xblit(font, &srcrc, screen, &dstrc, col, 0, 0);
-        x += 4;
-    }
+    SDL_memcpy(palette_colors, base_palette_colors, sizeof(palette_colors));
+    RefreshPalette();
 }
 
 int pico8emu(CELESTE_P8_CALLBACK_TYPE call, ...)
@@ -433,12 +148,34 @@ int pico8emu(CELESTE_P8_CALLBACK_TYPE call, ...)
     va_start(args, call);
 
 #define INT_ARG() va_arg(args, int)
-#define BOOL_ARG() (bool)va_arg(args, int)
-#define RET_INT(_i) do {ret = (_i); goto end;} while (0)
+#define BOOL_ARG() (Celeste_P8_bool_t)va_arg(args, int)
+#define RET_INT(_i)   do {ret = (_i); goto end;} while (0)
 #define RET_BOOL(_b) RET_INT(!!(_b))
 
     switch (call)
     {
+        case CELESTE_P8_MUSIC: //music(idx,fade,mask)
+        {
+#if CELESTE_P8_ENABLE_AUDIO
+            int index = INT_ARG();
+            int fade = INT_ARG();
+            int mask = INT_ARG();
+
+            (void)mask; //we do not care about this since sdl mixer keeps sounds and music separate
+
+            if (index == -1) { //stop playing
+                Mix_FadeOutMusic(fade);
+                current_music = NULL;
+            }
+            else if (mus[index / 10])
+            {
+                Mix_Music* musi = mus[index / 10];
+                current_music = musi;
+                Mix_FadeInMusic(musi, -1, fade);
+            }
+#endif
+            break;
+        }
         case CELESTE_P8_SPR: //spr(sprite,x,y,cols,rows,flipx,flipy)
         {
             int sprite = INT_ARG();
@@ -452,22 +189,23 @@ int pico8emu(CELESTE_P8_CALLBACK_TYPE call, ...)
             (void)cols;
             (void)rows;
 
-            assert(rows == 1 && cols == 1);
+            SDL_assert(rows == 1 && cols == 1);
 
             if (sprite >= 0)
             {
-                SDL_Rect srcrc = {
+                SDL_Rect srcrc =
+                {
                     8 * (sprite % 16),
                     8 * (sprite / 16)
                 };
                 SDL_Rect dstrc =
                 {
-                (x - camera_x) * scale, (y - camera_y) * scale,
-                scale, scale
+                    (x - camera_x) * SCALE, (y - camera_y) * SCALE,
+                    SCALE, SCALE
                 };
-                srcrc.x *= scale;
-                srcrc.y *= scale;
-                srcrc.w = srcrc.h = scale * 8;
+                srcrc.x *= SCALE;
+                srcrc.y *= SCALE;
+                srcrc.w = srcrc.h = SCALE * 8;
                 Xblit(gfx, &srcrc, screen, &dstrc, 0, flipx, flipy);
             }
             break;
@@ -475,8 +213,20 @@ int pico8emu(CELESTE_P8_CALLBACK_TYPE call, ...)
         case CELESTE_P8_BTN: //btn(b)
         {
             int b = INT_ARG();
-            assert(b >= 0 && b <= 5);
+            SDL_assert(b >= 0 && b <= 5);
             RET_BOOL(buttons_state & (1 << b));
+            break;
+        }
+        case CELESTE_P8_SFX: //sfx(id)
+        {
+#if CELESTE_P8_ENABLE_AUDIO
+            int id = INT_ARG();
+
+            if (id < (sizeof snd) / (sizeof * snd) && snd[id])
+            {
+                Mix_PlayChannel(-1, snd[id], 0);
+            }
+#endif
             break;
         }
         case CELESTE_P8_PAL: //pal(a,b)
@@ -505,40 +255,40 @@ int pico8emu(CELESTE_P8_CALLBACK_TYPE call, ...)
 
             if (r <= 1)
             {
-                SDL_Rect rect_a = { scale * (cx - 1), scale * cy, scale * 3, scale };
-                SDL_Rect rect_b = { scale * cx, scale * (cy - 1), scale, scale * 3 };
+                SDL_Rect rect_a = { SCALE * (cx - 1), SCALE * cy, SCALE * 3, SCALE };
+                SDL_Rect rect_b = { SCALE * cx, SCALE * (cy - 1), SCALE, SCALE * 3 };
 
                 SDL_FillSurfaceRect(screen, &rect_a, realcolor);
                 SDL_FillSurfaceRect(screen, &rect_b, realcolor);
             }
             else if (r <= 2)
             {
-                SDL_Rect rect_a = { scale * (cx - 2), scale * (cy - 1), scale * 5, scale * 3 };
-                SDL_Rect rect_b = { scale * (cx - 1), scale * (cy - 2), scale * 3, scale * 5 };
+                SDL_Rect rect_a = { SCALE * (cx - 2), SCALE * (cy - 1), SCALE * 5, SCALE * 3 };
+                SDL_Rect rect_b = { SCALE * (cx - 1), SCALE * (cy - 2), SCALE * 3, SCALE * 5 };
 
                 SDL_FillSurfaceRect(screen, &rect_a, realcolor);
                 SDL_FillSurfaceRect(screen, &rect_b, realcolor);
             }
             else if (r <= 3)
             {
-                SDL_Rect rect_a = { scale * (cx - 3), scale * (cy - 1), scale * 7, scale * 3 };
-                SDL_Rect rect_b = { scale * (cx - 1), scale * (cy - 3), scale * 3, scale * 7 };
-                SDL_Rect rect_c = { scale * (cx - 2), scale * (cy - 2), scale * 5, scale * 5 };
+                SDL_Rect rect_a = { SCALE * (cx - 3), SCALE * (cy - 1), SCALE * 7, SCALE * 3 };
+                SDL_Rect rect_b = { SCALE * (cx - 1), SCALE * (cy - 3), SCALE * 3, SCALE * 7 };
+                SDL_Rect rect_c = { SCALE * (cx - 2), SCALE * (cy - 2), SCALE * 5, SCALE * 5 };
 
                 SDL_FillSurfaceRect(screen, &rect_a, realcolor);
                 SDL_FillSurfaceRect(screen, &rect_b, realcolor);
                 SDL_FillSurfaceRect(screen, &rect_c, realcolor);
             }
-            else  //i dont think the game uses this
+            else  // I dont think the game uses this.
             {
-                int f = 1 - r; //used to track the progress of the drawn circle (since its semi-recursive)
-                int ddFx = 1;   //step x
-                int ddFy = -2 * r; //step y
+                int f = 1 - r; // Used to track the progress of the drawn circle (since its semi-recursive).
+                int ddFx = 1;   // Step x.
+                int ddFy = -2 * r; // Step y.
                 int x = 0;
                 int y = r;
 
-                //this algorithm doesn't account for the diameters
-                //so we have to set them manually
+                // This algorithm doesn't account for the diameters
+                // so we have to set them manually
                 p8_line(cx, cy - y, cx, cy + r, col);
                 p8_line(cx + r, cy, cx - r, cy, col);
 
@@ -554,7 +304,7 @@ int pico8emu(CELESTE_P8_CALLBACK_TYPE call, ...)
                     ddFx += 2;
                     f += ddFx;
 
-                    //build our current arc
+                    // Build our current arc.
                     p8_line(cx + x, cy + y, cx - x, cy + y, col);
                     p8_line(cx + x, cy - y, cx - x, cy - y, col);
                     p8_line(cx + y, cy + x, cx - y, cy + x, col);
@@ -584,7 +334,7 @@ int pico8emu(CELESTE_P8_CALLBACK_TYPE call, ...)
             p8_rectfill(x0, y0, x1, y1, col);
             break;
         }
-        case CELESTE_P8_LINE: //line(x0,y0,x1,y1,col)
+        case CELESTE_P8_LINE: // line(x0,y0,x1,y1,col)
         {
             int x0 = INT_ARG() - camera_x;
             int y0 = INT_ARG() - camera_y;
@@ -595,7 +345,7 @@ int pico8emu(CELESTE_P8_CALLBACK_TYPE call, ...)
             p8_line(x0, y0, x1, y1, col);
             break;
         }
-        case CELESTE_P8_MGET: //mget(tx,ty)
+        case CELESTE_P8_MGET: // mget(tx,ty)
         {
             int tx = INT_ARG();
             int ty = INT_ARG();
@@ -638,27 +388,17 @@ int pico8emu(CELESTE_P8_CALLBACK_TYPE call, ...)
                     {
                         SDL_Rect srcrc =
                         {
-                            8 * (tile % 16),
-                            8 * (tile / 16)
+                        8 * (tile % 16),
+                        8 * (tile / 16)
                         };
                         SDL_Rect dstrc =
                         {
-                            (tx + x * 8 - camera_x) * scale, (ty + y * 8 - camera_y) * scale,
-                            scale * 8, scale * 8
+                        (tx + x * 8 - camera_x) * SCALE, (ty + y * 8 - camera_y) * SCALE,
+                        SCALE * 8, SCALE * 8
                         };
-                        srcrc.x *= scale;
-                        srcrc.y *= scale;
-                        srcrc.w = srcrc.h = scale * 8;
-
-                        /*
-                        if (0)
-                        {
-                            srcrc.x = srcrc.y = 0;
-                            srcrc.w = srcrc.h = 8;
-                            dstrc.x = x*8, dstrc.y = y*8;
-                            dstrc.w = dstrc.h = 8;
-                        }
-                        */
+                        srcrc.x *= SCALE;
+                        srcrc.y *= SCALE;
+                        srcrc.w = srcrc.h = SCALE * 8;
 
                         Xblit(gfx, &srcrc, screen, &dstrc, 0, 0, 0);
                     }
@@ -673,16 +413,97 @@ end:
     return ret;
 }
 
+static Uint32 getpixel(SDL_Surface* surface, int x, int y)
+{
+    int bpp = SDL_BYTESPERPIXEL(surface->format);
+    /* Here p is the address to the pixel we want to retrieve */
+    Uint8* p = (Uint8*)surface->pixels + y * surface->pitch + x * bpp;
+
+    switch (bpp)
+    {
+        case 1:
+            return *p;
+        case 2:
+            return *(Uint16*)p;
+        case 3:
+            if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
+            {
+                return p[0] << 16 | p[1] << 8 | p[2];
+            }
+            else
+            {
+                return p[0] | p[1] << 8 | p[2] << 16;
+            }
+        case 4:
+            return *(Uint32*)p;
+        default:
+            return 0;
+    }
+}
+
 static int gettileflag(int tile, int flag)
 {
     return tile < sizeof(tile_flags) / sizeof(*tile_flags) && (tile_flags[tile] & (1 << flag)) != 0;
 }
 
-//coordinates should NOT be scaled before calling this
+static void loadbmpscale(char* filename, SDL_Surface** s)
+{
+    SDL_Surface* surf = *s;
+    char tmpath[256];
+    SDL_Surface* bmp;
+    int w, h;
+    unsigned char* data;
+
+    if (surf)
+    {
+        SDL_DestroySurface(surf), surf = *s = NULL;
+    }
+
+    SDL_snprintf(tmpath, sizeof tmpath, "%s%s", SDL_GetBasePath(), filename);
+
+    bmp = SDL_LoadBMP(tmpath);
+    if (!bmp)
+    {
+        SDL_Log("Error loading bmp '%s': %s\n", filename, SDL_GetError());
+        return;
+    }
+
+    w = bmp->w;
+    h = bmp->h;
+
+    surf = SDL_CreateSurface(w * SCALE, h * SCALE, screen->format);
+    SDL_assert(surf != NULL);
+    data = surf->pixels;
+    for (int y = 0; y < h; y++)
+    {
+        for (int x = 0; x < w; x++)
+        {
+            unsigned char pix = getpixel(bmp, x, y);
+            for (int i = 0; i < SCALE; i++)
+            {
+                for (int j = 0; j < SCALE; j++)
+                {
+                    data[x * SCALE + i + (y * SCALE + j) * w * SCALE] = pix;
+                }
+            }
+        }
+    }
+    SDL_DestroySurface(bmp);
+
+    palette.colors = palette_colors;
+    palette.ncolors = 16;
+
+    SDL_SetSurfacePalette(surf, &palette);
+    SDL_SetSurfaceColorKey(surf, true, 0);
+
+    *s = surf;
+}
+
+// Coordinates should NOT be scaled before calling this.
 static void p8_line(int x0, int y0, int x1, int y1, unsigned char color)
 {
-    Uint32   realcolor = getcolor(color);
-    int      sx, sy, dx, dy, err;
+    Uint32 realcolor = getcolor(color);
+    int sx, sy, dx, dy, err;
     SDL_Rect rect;
 
 #define CLAMP(v,min,max) v = v < min ? min : v >= max ? max-1 : v;
@@ -693,16 +514,16 @@ static void p8_line(int x0, int y0, int x1, int y1, unsigned char color)
 
 #undef CLAMP
 #define PLOT(xa, ya) \
-    rect.x = xa * scale; \
-    rect.y = ya * scale; \
-    rect.w = scale; \
-    rect.h = scale; \
+    rect.x = xa * SCALE; \
+    rect.y = ya * SCALE; \
+    rect.w = SCALE; \
+    rect.h = SCALE; \
     do { \
         SDL_FillSurfaceRect(screen, &rect, realcolor); \
     } \
     while (0)
-    dx = abs(x1 - x0);
-    dy = abs(y1 - y0);
+    dx = SDL_abs(x1 - x0);
+    dy = SDL_abs(y1 - y0);
     if (!dx && !dy)
     {
         return;
@@ -763,4 +584,179 @@ static void p8_line(int x0, int y0, int x1, int y1, unsigned char color)
         }
     }
 #undef PLOT
+}
+
+static void p8_print(const char* str, int x, int y, int col)
+{
+    for (char c = *str; c; c = *(++str))
+    {
+        SDL_Rect srcrc;
+        SDL_Rect dstrc;
+        c &= 0x7F;
+        srcrc.x = 8 * (c % 16);
+        srcrc.y = 8 * (c / 16);
+        srcrc.x *= SCALE;
+        srcrc.y *= SCALE;
+        srcrc.w = srcrc.h = 8 * SCALE;
+
+        dstrc.x = x * SCALE;
+        dstrc.y = y * SCALE;
+        dstrc.w = SCALE;
+        dstrc.h = SCALE;
+
+        Xblit(font, &srcrc, screen, &dstrc, col, 0, 0);
+        x += 4;
+    }
+}
+
+static void p8_rectfill(int x0, int y0, int x1, int y1, int col)
+{
+    int w = (x1 - x0 + 1) * SCALE;
+    int h = (y1 - y0 + 1) * SCALE;
+    if (w > 0 && h > 0)
+    {
+        SDL_Rect rc = { x0 * SCALE, y0 * SCALE, w, h };
+        SDL_FillSurfaceRect(screen, &rc, getcolor(col));
+    }
+}
+
+//lots of code from https://github.com/SDL-mirror/SDL/blob/bc59d0d4a2c814900a506d097a381077b9310509/src/video/SDL_surface.c#L625
+//coordinates should be scaled already
+static inline void Xblit(SDL_Surface* src, SDL_Rect* srcrect, SDL_Surface* dst, SDL_Rect* dstrect, int color, int flipx, int flipy)
+{
+    SDL_Rect fulldst;
+    int srcx, srcy, w, h;
+    //SDL_assert(src && dst && !src->locked && !dst->locked);
+    SDL_assert(SDL_BITSPERPIXEL(src->format) == 8);
+    SDL_assert(SDL_BYTESPERPIXEL(dst->format) == 2 || SDL_BYTESPERPIXEL(dst->format) == 4);
+    /* If the destination rectangle is NULL, use the entire dest surface */
+    if (!dstrect)
+    {
+        dstrect = (fulldst = (SDL_Rect){ 0,0,dst->w,dst->h }, &fulldst);
+    }
+
+    /* clip the source rectangle to the source surface */
+    if (srcrect)
+    {
+        int maxw, maxh;
+
+        srcx = srcrect->x;
+        w = srcrect->w;
+        if (srcx < 0)
+        {
+            w += srcx;
+            dstrect->x -= srcx;
+            srcx = 0;
+        }
+        maxw = src->w - srcx;
+        if (maxw < w)
+        {
+            w = maxw;
+        }
+
+        srcy = srcrect->y;
+        h = srcrect->h;
+        if (srcy < 0)
+        {
+            h += srcy;
+            dstrect->y -= srcy;
+            srcy = 0;
+        }
+        maxh = src->h - srcy;
+        if (maxh < h)
+        {
+            h = maxh;
+        }
+
+    }
+    else
+    {
+        srcx = srcy = 0;
+        w = src->w;
+        h = src->h;
+    }
+
+    /* clip the destination rectangle against the clip rectangle */
+    {
+        SDL_Rect* clip;
+        SDL_GetSurfaceClipRect(dst, clip);
+        int dx, dy;
+
+        dx = clip->x - dstrect->x;
+        if (dx > 0)
+        {
+            w -= dx;
+            dstrect->x += dx;
+            srcx += dx;
+        }
+        dx = dstrect->x + w - clip->x - clip->w;
+        if (dx > 0)
+        {
+            w -= dx;
+        }
+
+        dy = clip->y - dstrect->y;
+        if (dy > 0)
+        {
+            h -= dy;
+            dstrect->y += dy;
+            srcy += dy;
+        }
+        dy = dstrect->y + h - clip->y - clip->h;
+        if (dy > 0)
+        {
+            h -= dy;
+        }
+    }
+
+    if (w && h)
+    {
+        unsigned char* srcpix = src->pixels;
+        int            srcpitch = src->pitch;
+        int            x, y;
+#define _blitter(dsttype, dp, xflip) do { \
+            dsttype* dstpix = dst->pixels; \
+            for (y = 0; y < h; y++) \
+            { \
+                for (x = 0; x < w; x++) \
+                { \
+                    unsigned char p = srcpix[!xflip ? srcx+x+(srcy+y)*srcpitch : srcx+(w-x-1)+(srcy+y)*srcpitch]; \
+                    if (p) dstpix[dstrect->x+x + (dstrect->y+y)*dst->w] = getcolor(dp); \
+                } \
+            } \
+            } while(0)
+        if (SDL_BYTESPERPIXEL(screen->format) == 2 && color && flipx)
+        {
+            _blitter(Uint16, color, 1);
+        }
+        else if (SDL_BYTESPERPIXEL(screen->format) == 2 && !color && flipx)
+        {
+            _blitter(Uint16, p, 1);
+        }
+        else if (SDL_BYTESPERPIXEL(screen->format) == 2 && color && !flipx)
+        {
+            _blitter(Uint16, color, 0);
+        }
+        else if (SDL_BYTESPERPIXEL(screen->format) == 2 && !color && !flipx)
+        {
+            _blitter(Uint16, p, 0);
+        }
+        else if (SDL_BYTESPERPIXEL(screen->format) == 4 && color && flipx)
+        {
+            _blitter(Uint32, color, 1);
+        }
+        else if (SDL_BYTESPERPIXEL(screen->format) == 4 && !color && flipx)
+        {
+            _blitter(Uint32, p, 1);
+        }
+        else if (SDL_BYTESPERPIXEL(screen->format) == 4 && color && !flipx)
+        {
+            _blitter(Uint32, color, 0);
+        }
+        else if (SDL_BYTESPERPIXEL(screen->format) == 4 && !color && !flipx)
+        {
+            _blitter(Uint32, p, 0);
+        }
+#undef _blitter
+    }
 }

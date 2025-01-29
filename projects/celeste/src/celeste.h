@@ -1,17 +1,12 @@
-/* @file celeste.h
- *
- * A C source port of the original Celeste game,
- * highly optimized for the Nokia N-Gage.
- *
- * Original game by Maddy Makes Games.
- * C source port by lemon32767.
- *
- * https://github.com/lemon32767/ccleste
- *
- */
-
 #ifndef CELESTE_H_
 #define CELESTE_H_
+
+#ifdef __cplusplus
+#define _Bool bool
+extern "C" {
+#else
+#define _Bool int
+#endif
 
 typedef enum
 {
@@ -22,6 +17,7 @@ typedef enum
 
 } CELESTE_P8_CALLBACK_TYPE;
 
+typedef _Bool Celeste_P8_bool_t;
 typedef int (*Celeste_P8_cb_func_t) (CELESTE_P8_CALLBACK_TYPE calltype, ...);
 
 extern void Celeste_P8_set_call_func(Celeste_P8_cb_func_t func);
@@ -36,5 +32,9 @@ extern void Celeste_P8__DEBUG(void); //debug functionality
 size_t Celeste_P8_get_state_size(void);
 void Celeste_P8_save_state(void* st);
 void Celeste_P8_load_state(const void* st);
+
+#ifdef __cplusplus
+} //extern "C"
+#endif
 
 #endif
