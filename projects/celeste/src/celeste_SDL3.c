@@ -10,11 +10,15 @@
  *
  */
 
+#include <time.h>
 #include "SDL3/SDL.h"
 #include "celeste_SDL3.h"
 #include "celeste.h"
 #include "tilemap.h"
 
+extern SDL_Renderer* renderer;
+
+static SDL_Texture* SDL_screen = NULL;
 static SDL_Surface* screen = NULL;
 static SDL_Surface* gfx = NULL;
 static SDL_Surface* font = NULL;
@@ -45,24 +49,284 @@ static Uint32 map[16];
 
 #define getcolor(col) map[col % 16]
 
-static _Bool enable_screenshake = 1;
 static Uint16 buttons_state = 0;
+static _Bool enable_screenshake = 1;
+static _Bool paused= 0;
+static void* initial_game_state = NULL;
+static void* game_state = NULL;
+#if CELESTE_P8_ENABLE_AUDIO
+static Mix_Music* game_state_music   = NULL;
+#endif
+
+// On-screen display (for info, such as loading a state, toggling screenshake, toggling fullscreen, etc).
+static char osd_text[200] = "";
+static int  osd_timer = 0;
 
 static Uint32 getpixel(SDL_Surface* surface, int x, int y);
 static int gettileflag(int tile, int flag);
 static void loadbmpscale(char* filename, SDL_Surface** s);
 
+static void Flip();
+static void LoadData(void);
 static void SetPaletteEntry(unsigned char idx, unsigned char base_idx);
+static void RefreshPalette(void);
+static void ResetPalette(void);
+
+static void OSDset(const char* fmt, ...);
+static void OSDdraw(void);
 
 static void p8_line(int x0, int y0, int x1, int y1, unsigned char color);
 static void p8_print(const char* str, int x, int y, int col);
 static void p8_rectfill(int x0, int y0, int x1, int y1, int col);
+static int pico8emu(CELESTE_P8_CALLBACK_TYPE call, ...);
 static inline void Xblit(SDL_Surface* src, SDL_Rect* srcrect, SDL_Surface* dst, SDL_Rect* dstrect, int color, int flipx, int flipy);
 
 #define LOGLOAD(w) SDL_Log("loading %s...", w)
 #define LOGDONE() SDL_Log("done")
 
-void LoadData(void)
+int Init()
+{
+    int pico8emu(CELESTE_P8_CALLBACK_TYPE call, ...);
+
+    SDL_PixelFormat format = SDL_PIXELFORMAT_ARGB4444;
+
+    SDL_screen = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_STREAMING, PICO8_W, PICO8_H);
+    if (!SDL_screen)
+    {
+        SDL_Log("SDL_CreateTexture: %s\n", SDL_GetError());
+        return false;
+    }
+
+    screen = SDL_CreateSurface(PICO8_W, PICO8_H, format);
+    if (!screen)
+    {
+        SDL_Log("SDL_CreateSurface: %s\n", SDL_GetError());
+        return false;
+    }
+
+    ResetPalette();
+    SDL_HideCursor();
+
+    SDL_Log("game state size %gkb", Celeste_P8_get_state_size()/1024.);
+    SDL_Log("now loading...");
+
+    LoadData();
+    Celeste_P8_set_call_func(pico8emu);
+
+    // For reset.
+    initial_game_state = SDL_malloc(Celeste_P8_get_state_size());
+    if (initial_game_state)
+    {
+        Celeste_P8_save_state(initial_game_state);
+    }
+
+    Celeste_P8_set_rndseed((unsigned)(time(NULL) + SDL_GetTicks()));
+
+    Celeste_P8_init();
+
+    SDL_SetRenderDrawColor(renderer, 0x2f, 0x2f, 0x4f, 255);
+    SDL_RenderClear(renderer);
+
+    return true;
+}
+
+SDL_AppResult HandleEvents(SDL_Event* ev)
+{
+    switch (ev->type)
+    {
+        case SDL_EVENT_QUIT:
+        {
+            return SDL_APP_SUCCESS;
+        }
+        case SDL_EVENT_KEY_DOWN:
+        {
+            if (ev->key.repeat) // No key repeat.
+            {
+                break;
+            }
+
+            if (ev->key.key == SDLK_SOFTRIGHT) // Do pause.
+            {
+#if CELESTE_P8_ENABLE_AUDIO
+                if (paused)
+                {
+                    Mix_Resume(-1);
+                    Mix_ResumeMusic();
+                }
+                else
+                {
+                    Mix_Pause(-1);
+                    Mix_PauseMusic();
+                }
+#endif
+                paused = !paused;
+            }
+            else if (ev->key.key == SDLK_SOFTLEFT) // Exit.
+            {
+                return SDL_APP_SUCCESS;
+            }
+            else if (ev->key.key == SDLK_1) // Save state.
+            {
+                game_state = game_state ? game_state : SDL_malloc(Celeste_P8_get_state_size());
+                if (game_state)
+                {
+                    OSDset("save state");
+                    Celeste_P8_save_state(game_state);
+#if CELESTE_P8_ENABLE_AUDIO
+                    game_state_music = current_music;
+#endif
+                }
+            }
+            else if (ev->key.key == SDLK_2) // Load state.
+            {
+                if (game_state)
+                {
+                    OSDset("load state");
+#if CELESTE_P8_ENABLE_AUDIO
+                    if (paused)
+                    {
+                        paused = 0;
+                        Mix_Resume(-1);
+                        Mix_ResumeMusic();
+                    }
+#endif
+                    Celeste_P8_load_state(game_state);
+#if CELESTE_P8_ENABLE_AUDIO
+                    if (current_music != game_state_music)
+                    {
+                        Mix_HaltMusic();
+                        current_music = game_state_music;
+                        if (game_state_music)
+                        {
+                            Mix_PlayMusic(game_state_music, -1);
+                        }
+                    }
+#endif
+                }
+            }
+            else if (ev->key.key == SDLK_3) // Toggle screenshake.
+            {
+                enable_screenshake = !enable_screenshake;
+                OSDset("screenshake: %s", enable_screenshake ? "on" : "off");
+            }
+            break;
+        }
+    }
+
+    return SDL_APP_CONTINUE;
+}
+
+int Iterate()
+{
+    int numkeys;
+    const bool* kbstate = SDL_GetKeyboardState(&numkeys);
+    static int reset_input_timer  = 0;
+    Uint16 prev_buttons_state = buttons_state;
+
+    // Hold C (backspace) to reset.
+    if (initial_game_state != NULL && kbstate[SDL_SCANCODE_BACKSPACE])
+    {
+        reset_input_timer++;
+        if (reset_input_timer >= 30)
+        {
+            reset_input_timer=0;
+            OSDset("reset");
+            paused = 0;
+            Celeste_P8_load_state(initial_game_state);
+            Celeste_P8_set_rndseed((unsigned)(time(NULL) + SDL_GetTicks()));
+#if CELESTE_P8_ENABLE_AUDIO
+            Mix_HaltChannel(-1);
+            Mix_HaltMusic();
+#endif
+            Celeste_P8_init();
+        }
+    }
+    else
+    {
+        reset_input_timer = 0;
+    }
+
+    prev_buttons_state = buttons_state;
+    buttons_state = 0;
+
+    if (kbstate[SDL_SCANCODE_LEFT])  buttons_state |= (1 << 0);
+    if (kbstate[SDL_SCANCODE_RIGHT]) buttons_state |= (1 << 1);
+    if (kbstate[SDL_SCANCODE_UP])    buttons_state |= (1 << 2);
+    if (kbstate[SDL_SCANCODE_DOWN])  buttons_state |= (1 << 3);
+    if (kbstate[SDL_SCANCODE_7])     buttons_state |= (1 << 4);
+    if (kbstate[SDL_SCANCODE_5])     buttons_state |= (1 << 5);
+
+    if (paused)
+    {
+        const int x0 = PICO8_W/2-3*4, y0 = 8;
+
+        p8_rectfill(x0-1,y0-1, 6*4+x0+1,6+y0+1, 6);
+        p8_rectfill(x0,y0, 6*4+x0,6+y0, 0);
+        p8_print("paused", x0+1, y0+1, 7);
+    }
+    else
+    {
+        Celeste_P8_update();
+        Celeste_P8_draw();
+    }
+    OSDdraw();
+    Flip();
+
+    return true;
+}
+
+void Destroy()
+{
+    if (game_state)
+    {
+        SDL_free(game_state);
+    }
+    if (initial_game_state)
+    {
+        SDL_free(initial_game_state);
+    }
+    if (gfx)
+    {
+        SDL_DestroySurface(gfx);
+    }
+    if (font)
+    {
+        SDL_DestroySurface(font);
+    }
+#if CELESTE_P8_ENABLE_AUDIO
+    for (i = 0; i < (sizeof snd)/(sizeof *snd); i++)
+    {
+        if (snd[i])
+        {
+            Mix_FreeChunk(snd[i]);
+        }
+    }
+    for (i = 0; i < (sizeof mus)/(sizeof *mus); i++)
+    {
+        if (mus[i])
+        {
+            Mix_FreeMusic(mus[i]);
+        }
+    }
+
+    Mix_CloseAudio();
+    Mix_Quit();
+#endif
+}
+
+static void Flip()
+{
+    SDL_FRect source = { 0.f, 0.f, 128.f, 128.f };
+    SDL_FRect dest   = { 24.f, 40.f, 128.f, 128.f };
+
+    SDL_UpdateTexture(SDL_screen, NULL, screen->pixels, screen->pitch);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+
+    SDL_RenderTexture(renderer, SDL_screen, &source, &dest);
+    SDL_RenderPresent(renderer);
+}
+
+static void LoadData(void)
 {
 #if CELESTE_P8_ENABLE_AUDIO
     static const char sndids[] = { 0,1,2,3,4,5,6,7,8,9,13,14,15,16,23,35,37,38,40,50,51,54,55 };
@@ -120,7 +384,7 @@ static void SetPaletteEntry(unsigned char idx, unsigned char base_idx)
     map[idx] = SDL_MapSurfaceRGB(screen, palette_colors[idx].r, palette_colors[idx].g, palette_colors[idx].b);
 }
 
-void RefreshPalette(void)
+static void RefreshPalette(void)
 {
     for (int i = 0; i < SDL_arraysize(map); i++)
     {
@@ -128,13 +392,41 @@ void RefreshPalette(void)
     }
 }
 
-void ResetPalette(void)
+static void ResetPalette(void)
 {
     SDL_memcpy(palette_colors, base_palette_colors, sizeof(palette_colors));
     RefreshPalette();
 }
 
-int pico8emu(CELESTE_P8_CALLBACK_TYPE call, ...)
+static void OSDset(const char* fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+    SDL_vsnprintf(osd_text, sizeof osd_text, fmt, ap);
+    osd_text[sizeof osd_text - 1] = '\0'; //make sure to add NUL terminator in case of truncation
+    SDL_Log("%s", osd_text);
+    osd_timer = 30;
+    va_end(ap);
+}
+
+static void OSDdraw(void)
+{
+    if (osd_timer > 0)
+    {
+        --osd_timer;
+    }
+
+    if (osd_timer > 0)
+    {
+        const int x = 4;
+        const int y = 120 + (osd_timer < 10 ? 10-osd_timer : 0); //disappear by going below the screen
+        p8_rectfill(x-2, y-2, x+4*(int)SDL_strlen(osd_text), y+6, 6); //outline
+        p8_rectfill(x-1, y-1, x+4*(int)SDL_strlen(osd_text)-1, y+5, 0);
+        p8_print(osd_text, x, y, 7);
+    }
+}
+
+static int pico8emu(CELESTE_P8_CALLBACK_TYPE call, ...)
 {
     static int camera_x = 0, camera_y = 0;
     va_list    args;
@@ -383,7 +675,7 @@ int pico8emu(CELESTE_P8_CALLBACK_TYPE call, ...)
                 for (y = 0; y < mh; y++)
                 {
                     int tile = tilemap_data[x + mx + (y + my) * 128];
-                    //hack
+                    // Hack.
                     if (mask == 0 || (mask == 4 && tile_flags[tile] == 4) || gettileflag(tile, mask != 4 ? mask - 1 : mask))
                     {
                         SDL_Rect srcrc =
@@ -626,8 +918,7 @@ static inline void Xblit(SDL_Surface* src, SDL_Rect* srcrect, SDL_Surface* dst, 
 {
     SDL_Rect fulldst;
     int srcx, srcy, w, h;
-    //SDL_assert(src && dst && !src->locked && !dst->locked);
-    SDL_assert(SDL_BITSPERPIXEL(src->format) == 8);
+    //SDL_assert(SDL_BITSPERPIXEL(src->format) == 8);
     SDL_assert(SDL_BYTESPERPIXEL(dst->format) == 2 || SDL_BYTESPERPIXEL(dst->format) == 4);
     /* If the destination rectangle is NULL, use the entire dest surface */
     if (!dstrect)
@@ -678,31 +969,31 @@ static inline void Xblit(SDL_Surface* src, SDL_Rect* srcrect, SDL_Surface* dst, 
 
     /* clip the destination rectangle against the clip rectangle */
     {
-        SDL_Rect* clip;
-        SDL_GetSurfaceClipRect(dst, clip);
+        SDL_Rect clip;
+        SDL_GetSurfaceClipRect(dst, &clip);
         int dx, dy;
 
-        dx = clip->x - dstrect->x;
+        dx = clip.x - dstrect->x;
         if (dx > 0)
         {
             w -= dx;
             dstrect->x += dx;
             srcx += dx;
         }
-        dx = dstrect->x + w - clip->x - clip->w;
+        dx = dstrect->x + w - clip.x - clip.w;
         if (dx > 0)
         {
             w -= dx;
         }
 
-        dy = clip->y - dstrect->y;
+        dy = clip.y - dstrect->y;
         if (dy > 0)
         {
             h -= dy;
             dstrect->y += dy;
             srcy += dy;
         }
-        dy = dstrect->y + h - clip->y - clip->h;
+        dy = dstrect->y + h - clip.y - clip.h;
         if (dy > 0)
         {
             h -= dy;

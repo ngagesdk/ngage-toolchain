@@ -1744,7 +1744,7 @@ static OBJ* init_object(OBJTYPE type, float x, float y)
     if (!obj)
     {
         // No more free space for objects, give up.
-        printf("exhausted object memory..\n");
+        SDL_Log("Exhausted object memory..");
         return NULL;
     }
     obj->active = true;
@@ -2122,10 +2122,10 @@ redo_draw:;
         if (this_id != o->id) goto redo_draw;
     }
 
-    // draw fg terrain
+    // Draw fg terrain.
     P8map(room.x * 16, room.y * 16, 0, 0, 16, 16, 8);
 
-    // particles
+    // Particles.
     for (i = 0; i <= 24; i++)
     {
         PARTICLE* p = &particles[i];
@@ -2209,7 +2209,6 @@ static void draw_object(OBJ* obj)
     {
         P8spr(obj->spr, obj->x, obj->y, 1, 1, obj->flip_x, obj->flip_y);
     }
-    //if (floorf(obj->spr) != obj->spr) printf("?%g %s\n", obj->spr, OBJ_PROP(obj).nam);
 }
 
 static void draw_time(float x, float y)

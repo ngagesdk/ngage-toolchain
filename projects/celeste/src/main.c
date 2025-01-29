@@ -12,16 +12,12 @@
 
 #define SDL_MAIN_USE_CALLBACKS 1
 
-#include <time.h>
 #include "SDL3/SDL.h"
 #include "SDL3/SDL_main.h"
-#include "celeste.h"
 #include "celeste_SDL3.h"
 
 SDL_Window* window;
 SDL_Renderer* renderer;
-
-static void* initial_game_state = NULL;
 
 // This function runs once at startup.
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
@@ -42,43 +38,38 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
         return SDL_APP_FAILURE;
     }
 
-    int pico8emu(CELESTE_P8_CALLBACK_TYPE call, ...);
-
-    ResetPalette();
-    SDL_HideCursor();
-
-    SDL_Log("game state size %gkb", Celeste_P8_get_state_size()/1024.);
-    SDL_Log("now loading...");
-
-    LoadData();
-    Celeste_P8_set_call_func(pico8emu);
-
-    // For reset.
-    initial_game_state = SDL_malloc(Celeste_P8_get_state_size());
-    if (initial_game_state)
+    if (!Init())
     {
-        Celeste_P8_save_state(initial_game_state);
+        return SDL_APP_FAILURE;
     }
-
-    Celeste_P8_set_rndseed((unsigned)(time(NULL) + SDL_GetTicks()));
-
-    return SDL_APP_CONTINUE;
+    else
+    {
+        return SDL_APP_CONTINUE;
+    }
 }
 
 // This function runs when a new event (Keypresses, etc) occurs.
 SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 {
-    return SDL_APP_CONTINUE;
+    return HandleEvents(event);
 }
 
 // This function runs once per frame, and is the heart of the program.
 SDL_AppResult SDL_AppIterate(void* appstate)
 {
-    return SDL_APP_CONTINUE;
+    if (!Iterate())
+    {
+        return SDL_APP_SUCCESS;
+    }
+    else
+    {
+        return SDL_APP_CONTINUE;
+    }
 }
 
 // This function runs once at shutdown.
 void SDL_AppQuit(void* appstate, SDL_AppResult result)
 {
+    Destroy();
     // SDL will clean up the window/renderer for us.
 }

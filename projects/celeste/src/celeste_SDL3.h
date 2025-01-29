@@ -14,7 +14,6 @@
 #define CELESTE_SDL3_H
 
 #include <SDL3/SDL.h>
-#include "celeste.h"
 
 #define NGAGE_W 176
 #define NGAGE_H 208
@@ -24,10 +23,9 @@
 
 #define SCALE 1
 
-void LoadData(void);
-void RefreshPalette(void);
-void ResetPalette(void);
-
-int pico8emu(CELESTE_P8_CALLBACK_TYPE call, ...);
+int Init();
+SDL_AppResult HandleEvents(SDL_Event* ev);
+int Iterate();
+void Destroy();
 
 #endif // CELESTE_SDL3_H
