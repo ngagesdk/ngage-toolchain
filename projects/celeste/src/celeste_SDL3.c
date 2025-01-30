@@ -352,7 +352,7 @@ void Destroy()
 static void Flip()
 {
     SDL_FRect source = { 0.f, 0.f, 128.f, 128.f };
-    SDL_FRect dest   = { 24.f, 40.f, 128.f, 128.f };
+    SDL_FRect dest   = { 24.f, 25.f, 128.f, 128.f };
 
     SDL_UpdateTexture(SDL_screen, NULL, screen->pixels, screen->pitch);
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
