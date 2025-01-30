@@ -19,6 +19,7 @@
 extern SDL_Renderer* renderer;
 
 static SDL_Texture* SDL_screen = NULL;
+static SDL_Texture* frame = NULL;
 static SDL_Surface* screen = NULL;
 static SDL_Surface* gfx = NULL;
 static SDL_Surface* font = NULL;
@@ -124,8 +125,34 @@ int Init()
 
     Celeste_P8_init();
 
-    SDL_SetRenderDrawColor(renderer, 0x2f, 0x2f, 0x4f, 255);
-    SDL_RenderClear(renderer);
+    char tmpath[256];
+    SDL_snprintf(tmpath, sizeof tmpath, "%sframe.bmp", SDL_GetBasePath());
+
+    SDL_Surface* frame_sf = SDL_LoadBMP(tmpath);
+    if (!frame_sf)
+    {
+        SDL_Log("Failed to load image: frame.bmp", SDL_GetError());
+        return false;
+    }
+    else
+    {
+        if (0 != SDL_SetSurfaceColorKey(frame_sf, true, SDL_MapSurfaceRGB(frame_sf, 0xff, 0x00, 0xff)))
+        {
+            SDL_Log("Failed to set color key for frame.bmp: %s", SDL_GetError());
+        }
+        if (0 != SDL_SetSurfaceRLE(frame_sf, 1))
+        {
+            SDL_Log("Could not enable RLE for surface frame.bmp: %s", SDL_GetError());
+        }
+
+        frame = SDL_CreateTextureFromSurface(renderer, frame_sf);
+        if (!frame)
+        {
+            SDL_Log("Could not create texture from surface: %s", SDL_GetError());
+        }
+        SDL_DestroySurface(frame_sf);
+        SDL_RenderTexture(renderer, frame, NULL, NULL);
+    }
 
     return true;
 }
@@ -292,6 +319,14 @@ void Destroy()
     if (font)
     {
         SDL_DestroySurface(font);
+    }
+    if (frame)
+    {
+        SDL_DestroyTexture(frame);
+    }
+    if (SDL_screen)
+    {
+        SDL_DestroyTexture(SDL_screen);
     }
 #if CELESTE_P8_ENABLE_AUDIO
     for (i = 0; i < (sizeof snd)/(sizeof *snd); i++)
@@ -735,7 +770,7 @@ static Uint32 getpixel(SDL_Surface* surface, int x, int y)
         else
         {
             // Set alpha to 15 (fully opaque).
-            Uint8 a4 = 15;
+            a4 = 15;
         }
 
         // Combine into ARGB4444.
@@ -1028,7 +1063,7 @@ static inline void Xblit(SDL_Surface* src, SDL_Rect* srcrect, SDL_Surface* dst, 
                 Uint16 p = srcpix[!flipx ? srcx + x + (srcy + y) * srcpitch : srcx + (w - x - 1) + (srcy + y) * srcpitch];
                 if (p)
                 {
-                    dstpix[dstrect->x + x + (dstrect->y + y) * dstpitch] = color ? color : p;
+                    dstpix[dstrect->x + x + (dstrect->y + y) * dstpitch] = p;
                 }
             }
         }
