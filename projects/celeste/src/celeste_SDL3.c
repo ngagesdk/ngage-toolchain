@@ -713,19 +713,15 @@ static Uint32 getpixel(SDL_Surface* surface, int x, int y)
 
     switch (bpp)
     {
-        case 1:
-            return *p;
         case 2:
-            return *(Uint16*)p;
-        case 3:
-            if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
-            {
-                return p[0] << 16 | p[1] << 8 | p[2];
-            }
-            else
-            {
-                return p[0] | p[1] << 8 | p[2] << 16;
-            }
+        {
+            Uint16 pixel = *(Uint16*)p;
+            Uint8 a = (pixel & 0xF000) >> 12;
+            Uint8 r = (pixel & 0x0F00) >> 8;
+            Uint8 g = (pixel & 0x00F0) >> 4;
+            Uint8 b = (pixel & 0x000F);
+            return (a << 28) | (r << 20) | (g << 12) | (b << 4);
+        }
         case 4:
             return *(Uint32*)p;
         default:
@@ -742,9 +738,10 @@ static void loadbmpscale(char* filename, SDL_Surface** s)
 {
     SDL_Surface* surf = *s;
     char tmpath[256];
+    SDL_Surface* tmp;
     SDL_Surface* bmp;
     int w, h;
-    unsigned char* data;
+    Uint16* data;
 
     if (surf)
     {
@@ -753,29 +750,37 @@ static void loadbmpscale(char* filename, SDL_Surface** s)
 
     SDL_snprintf(tmpath, sizeof tmpath, "%s%s", SDL_GetBasePath(), filename);
 
-    bmp = SDL_LoadBMP(tmpath);
-    if (!bmp)
+    tmp = SDL_LoadBMP(tmpath);
+    if (!tmp)
     {
         SDL_Log("Error loading bmp '%s': %s\n", filename, SDL_GetError());
         return;
     }
+    bmp = SDL_ConvertSurfaceFormat(tmp, SDL_PIXELFORMAT_ARGB4444);
+    if (!bmp)
+    {
+        SDL_Log("Error converting bmp '%s': %s\n", filename, SDL_GetError());
+        SDL_DestroySurface(tmp);
+        return;
+    }
+    SDL_DestroySurface(tmp);
 
     w = bmp->w;
     h = bmp->h;
 
     surf = SDL_CreateSurface(w * SCALE, h * SCALE, screen->format);
     SDL_assert(surf != NULL);
-    data = surf->pixels;
+    data = (Uint16*)surf->pixels;
     for (int y = 0; y < h; y++)
     {
         for (int x = 0; x < w; x++)
         {
-            unsigned char pix = getpixel(bmp, x, y);
+            Uint16 pix = (Uint16)getpixel(bmp, x, y);
             for (int i = 0; i < SCALE; i++)
             {
                 for (int j = 0; j < SCALE; j++)
                 {
-                    data[x * SCALE + i + (y * SCALE + j) * w * SCALE] = pix;
+                    data[(x * SCALE + i) + (y * SCALE + j) * w * SCALE] = pix;
                 }
             }
         }
@@ -918,15 +923,13 @@ static inline void Xblit(SDL_Surface* src, SDL_Rect* srcrect, SDL_Surface* dst, 
 {
     SDL_Rect fulldst;
     int srcx, srcy, w, h;
-    //SDL_assert(SDL_BITSPERPIXEL(src->format) == 8);
-    SDL_assert(SDL_BYTESPERPIXEL(dst->format) == 2 || SDL_BYTESPERPIXEL(dst->format) == 4);
-    /* If the destination rectangle is NULL, use the entire dest surface */
+    SDL_assert(SDL_BYTESPERPIXEL(dst->format) == 2);
+
     if (!dstrect)
     {
         dstrect = (fulldst = (SDL_Rect){ 0,0,dst->w,dst->h }, &fulldst);
     }
 
-    /* clip the source rectangle to the source surface */
     if (srcrect)
     {
         int maxw, maxh;
@@ -967,87 +970,54 @@ static inline void Xblit(SDL_Surface* src, SDL_Rect* srcrect, SDL_Surface* dst, 
         h = src->h;
     }
 
-    /* clip the destination rectangle against the clip rectangle */
+    SDL_Rect clip;
+    SDL_GetSurfaceClipRect(dst, &clip);
+    int dx, dy;
+
+    dx = clip.x - dstrect->x;
+    if (dx > 0)
     {
-        SDL_Rect clip;
-        SDL_GetSurfaceClipRect(dst, &clip);
-        int dx, dy;
+        w -= dx;
+        dstrect->x += dx;
+        srcx += dx;
+    }
+    dx = dstrect->x + w - clip.x - clip.w;
+    if (dx > 0)
+    {
+        w -= dx;
+    }
 
-        dx = clip.x - dstrect->x;
-        if (dx > 0)
-        {
-            w -= dx;
-            dstrect->x += dx;
-            srcx += dx;
-        }
-        dx = dstrect->x + w - clip.x - clip.w;
-        if (dx > 0)
-        {
-            w -= dx;
-        }
-
-        dy = clip.y - dstrect->y;
-        if (dy > 0)
-        {
-            h -= dy;
-            dstrect->y += dy;
-            srcy += dy;
-        }
-        dy = dstrect->y + h - clip.y - clip.h;
-        if (dy > 0)
-        {
-            h -= dy;
-        }
+    dy = clip.y - dstrect->y;
+    if (dy > 0)
+    {
+        h -= dy;
+        dstrect->y += dy;
+        srcy += dy;
+    }
+    dy = dstrect->y + h - clip.y - clip.h;
+    if (dy > 0)
+    {
+        h -= dy;
     }
 
     if (w && h)
     {
-        unsigned char* srcpix = src->pixels;
-        int            srcpitch = src->pitch;
-        int            x, y;
-#define _blitter(dsttype, dp, xflip) do { \
-            dsttype* dstpix = dst->pixels; \
-            for (y = 0; y < h; y++) \
-            { \
-                for (x = 0; x < w; x++) \
-                { \
-                    unsigned char p = srcpix[!xflip ? srcx+x+(srcy+y)*srcpitch : srcx+(w-x-1)+(srcy+y)*srcpitch]; \
-                    if (p) dstpix[dstrect->x+x + (dstrect->y+y)*dst->w] = getcolor(dp); \
-                } \
-            } \
-            } while(0)
-        if (SDL_BYTESPERPIXEL(screen->format) == 2 && color && flipx)
+        Uint16* srcpix = (Uint16*)src->pixels;
+        Uint16* dstpix = (Uint16*)dst->pixels;
+        int srcpitch = src->pitch / 2;
+        int dstpitch = dst->pitch / 2;
+        int x, y;
+
+        for (y = 0; y < h; y++)
         {
-            _blitter(Uint16, color, 1);
+            for (x = 0; x < w; x++)
+            {
+                Uint16 p = srcpix[!flipx ? srcx + x + (srcy + y) * srcpitch : srcx + (w - x - 1) + (srcy + y) * srcpitch];
+                if (p)
+                {
+                    dstpix[dstrect->x + x + (dstrect->y + y) * dstpitch] = color ? color : p;
+                }
+            }
         }
-        else if (SDL_BYTESPERPIXEL(screen->format) == 2 && !color && flipx)
-        {
-            _blitter(Uint16, p, 1);
-        }
-        else if (SDL_BYTESPERPIXEL(screen->format) == 2 && color && !flipx)
-        {
-            _blitter(Uint16, color, 0);
-        }
-        else if (SDL_BYTESPERPIXEL(screen->format) == 2 && !color && !flipx)
-        {
-            _blitter(Uint16, p, 0);
-        }
-        else if (SDL_BYTESPERPIXEL(screen->format) == 4 && color && flipx)
-        {
-            _blitter(Uint32, color, 1);
-        }
-        else if (SDL_BYTESPERPIXEL(screen->format) == 4 && !color && flipx)
-        {
-            _blitter(Uint32, p, 1);
-        }
-        else if (SDL_BYTESPERPIXEL(screen->format) == 4 && color && !flipx)
-        {
-            _blitter(Uint32, color, 0);
-        }
-        else if (SDL_BYTESPERPIXEL(screen->format) == 4 && !color && !flipx)
-        {
-            _blitter(Uint32, p, 0);
-        }
-#undef _blitter
     }
 }
