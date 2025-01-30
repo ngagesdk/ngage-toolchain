@@ -403,7 +403,7 @@ static void OSDset(const char* fmt, ...)
     va_list ap;
     va_start(ap, fmt);
     SDL_vsnprintf(osd_text, sizeof osd_text, fmt, ap);
-    osd_text[sizeof osd_text - 1] = '\0'; //make sure to add NUL terminator in case of truncation
+    osd_text[sizeof osd_text - 1] = '\0'; // Make sure to add NUL terminator in case of truncation.
     SDL_Log("%s", osd_text);
     osd_timer = 30;
     va_end(ap);
@@ -419,8 +419,8 @@ static void OSDdraw(void)
     if (osd_timer > 0)
     {
         const int x = 4;
-        const int y = 120 + (osd_timer < 10 ? 10-osd_timer : 0); //disappear by going below the screen
-        p8_rectfill(x-2, y-2, x+4*(int)SDL_strlen(osd_text), y+6, 6); //outline
+        const int y = 120 + (osd_timer < 10 ? 10-osd_timer : 0); // Disappear by going below the screen.
+        p8_rectfill(x-2, y-2, x+4*(int)SDL_strlen(osd_text), y+6, 6); // Outline.
         p8_rectfill(x-1, y-1, x+4*(int)SDL_strlen(osd_text)-1, y+5, 0);
         p8_print(osd_text, x, y, 7);
     }
@@ -527,7 +527,7 @@ static int pico8emu(CELESTE_P8_CALLBACK_TYPE call, ...)
             int b = INT_ARG();
             if (a >= 0 && a < 16 && b >= 0 && b < 16)
             {
-                //swap palette colors
+                // Swap palette colors.
                 SetPaletteEntry(a, b);
             }
             break;
@@ -725,10 +725,20 @@ static Uint32 getpixel(SDL_Surface* surface, int x, int y)
         Uint8 g4 = (g6 * 15) / 63;
         Uint8 b4 = (b5 * 15) / 31;
 
-        // Set alpha to 15 (fully opaque).
-        Uint8 a4 = 15;
+        Uint8 a4;
+        Uint32 key;
+        SDL_GetSurfaceColorKey(surface, &key);
+        if (pixel == key)
+        {
+            a4 = 0;
+        }
+        else
+        {
+            // Set alpha to 15 (fully opaque).
+            Uint8 a4 = 15;
+        }
 
-        // Combine into ARGB4444
+        // Combine into ARGB4444.
         return (a4 << 12) | (r4 << 8) | (g4 << 4) | b4;
     }
     else if (bpp == 4) // ARGB8888, passthrough.
