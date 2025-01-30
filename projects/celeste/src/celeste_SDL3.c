@@ -711,21 +711,33 @@ static Uint32 getpixel(SDL_Surface* surface, int x, int y)
     /* Here p is the address to the pixel we want to retrieve */
     Uint8* p = (Uint8*)surface->pixels + y * surface->pitch + x * bpp;
 
-    switch (bpp)
+    if (bpp == 2) // RGB565.
     {
-        case 2:
-        {
-            Uint16 pixel = *(Uint16*)p;
-            Uint8 a = (pixel & 0xF000) >> 12;
-            Uint8 r = (pixel & 0x0F00) >> 8;
-            Uint8 g = (pixel & 0x00F0) >> 4;
-            Uint8 b = (pixel & 0x000F);
-            return (a << 28) | (r << 20) | (g << 12) | (b << 4);
-        }
-        case 4:
-            return *(Uint32*)p;
-        default:
-            return 0;
+        Uint16 pixel = *(Uint16*)p;
+
+        // Extract RGB565 channels.
+        Uint8 r5 = (pixel >> 11) & 0x1F; // 5 bits for red.
+        Uint8 g6 = (pixel >> 5) & 0x3F;  // 6 bits for green.
+        Uint8 b5 = pixel & 0x1F;         // 5 bits for blue.
+
+        // Scale to 4 bits for ARGB4444.
+        Uint8 r4 = (r5 * 15) / 31;
+        Uint8 g4 = (g6 * 15) / 63;
+        Uint8 b4 = (b5 * 15) / 31;
+
+        // Set alpha to 15 (fully opaque).
+        Uint8 a4 = 15;
+
+        // Combine into ARGB4444
+        return (a4 << 12) | (r4 << 8) | (g4 << 4) | b4;
+    }
+    else if (bpp == 4) // ARGB8888, passthrough.
+    {
+        return *(Uint32*)p;
+    }
+    else // Unsupported format.
+    {
+        return 0;
     }
 }
 
@@ -738,7 +750,6 @@ static void loadbmpscale(char* filename, SDL_Surface** s)
 {
     SDL_Surface* surf = *s;
     char tmpath[256];
-    SDL_Surface* tmp;
     SDL_Surface* bmp;
     int w, h;
     Uint16* data;
@@ -750,20 +761,12 @@ static void loadbmpscale(char* filename, SDL_Surface** s)
 
     SDL_snprintf(tmpath, sizeof tmpath, "%s%s", SDL_GetBasePath(), filename);
 
-    tmp = SDL_LoadBMP(tmpath);
-    if (!tmp)
+    bmp = SDL_LoadBMP(tmpath);
+    if (!bmp)
     {
         SDL_Log("Error loading bmp '%s': %s\n", filename, SDL_GetError());
         return;
     }
-    bmp = SDL_ConvertSurfaceFormat(tmp, SDL_PIXELFORMAT_ARGB4444);
-    if (!bmp)
-    {
-        SDL_Log("Error converting bmp '%s': %s\n", filename, SDL_GetError());
-        SDL_DestroySurface(tmp);
-        return;
-    }
-    SDL_DestroySurface(tmp);
 
     w = bmp->w;
     h = bmp->h;
