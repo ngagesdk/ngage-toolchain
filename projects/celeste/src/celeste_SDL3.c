@@ -10,6 +10,7 @@
  *
  */
 
+#include <stdio.h>
 #include <time.h>
 #include "SDL3/SDL.h"
 #include "celeste_SDL3.h"
@@ -202,10 +203,39 @@ SDL_AppResult HandleEvents(SDL_Event* ev)
 #if CELESTE_P8_ENABLE_AUDIO
                     game_state_music = current_music;
 #endif
+                    char tmpath[256];
+                    SDL_snprintf(tmpath, sizeof(tmpath), "%sceleste.sav", SDL_GetUserFolder(SDL_FOLDER_SAVEDGAMES));
+                    FILE* savefile = fopen(tmpath, "wb+");
+                    if (savefile)
+                    {
+                        fwrite(game_state, Celeste_P8_get_state_size(), 1, savefile);
+                        fclose(savefile);
+                    }
                 }
             }
             else if (ev->key.key == SDLK_2) // Load state.
             {
+                char tmpath[256];
+                SDL_snprintf(tmpath, sizeof(tmpath), "%sceleste.sav", SDL_GetUserFolder(SDL_FOLDER_SAVEDGAMES));
+                FILE* savefile = fopen(tmpath, "rb");
+                if (savefile)
+                {
+                    if (!game_state)
+                    {
+                        game_state = SDL_malloc(Celeste_P8_get_state_size());
+                        if (!game_state)
+                        {
+                            fclose(savefile);
+                            break;
+                        }
+                    }
+                    if (game_state)
+                    {
+                        fread(game_state, Celeste_P8_get_state_size(), 1, savefile);
+                    }
+                    fclose(savefile);
+                }
+
                 if (game_state)
                 {
                     OSDset("load state");
