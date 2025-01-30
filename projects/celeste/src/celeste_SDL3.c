@@ -140,10 +140,6 @@ int Init()
         {
             SDL_Log("Failed to set color key for frame.bmp: %s", SDL_GetError());
         }
-        if (0 != SDL_SetSurfaceRLE(frame_sf, 1))
-        {
-            SDL_Log("Could not enable RLE for surface frame.bmp: %s", SDL_GetError());
-        }
 
         frame = SDL_CreateTextureFromSurface(renderer, frame_sf);
         if (!frame)
@@ -191,6 +187,10 @@ SDL_AppResult HandleEvents(SDL_Event* ev)
             else if (ev->key.key == SDLK_SOFTLEFT) // Exit.
             {
                 return SDL_APP_SUCCESS;
+            }
+            else if (ev->key.key == SDLK_HASH) // Toggle FPS.
+            {
+                SDL_RenderTexture(renderer, frame, NULL, NULL);
             }
             else if (ev->key.key == SDLK_1) // Save state.
             {
