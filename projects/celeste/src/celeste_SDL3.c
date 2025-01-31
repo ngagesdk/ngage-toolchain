@@ -151,11 +151,6 @@ int Init()
     }
     else
     {
-        if (0 != SDL_SetSurfaceColorKey(frame_sf, true, SDL_MapSurfaceRGB(frame_sf, 0xff, 0x00, 0xff)))
-        {
-            SDL_Log("Failed to set color key for frame.bmp: %s", SDL_GetError());
-        }
-
         frame = SDL_CreateTextureFromSurface(renderer, frame_sf);
         if (!frame)
         {
@@ -283,6 +278,22 @@ SDL_AppResult HandleEvents(SDL_Event* ev)
                 enable_screenshake = !enable_screenshake;
                 OSDset("screenshake: %s", enable_screenshake ? "on" : "off");
             }
+            else if (ev->key.key == SDLK_6)
+            {
+                static bool mute = false;
+                mute = !mute;
+
+                if (mute)
+                {
+                    Mix_Volume(-1, 0);
+                    OSDset("mute");
+                }
+                else
+                {
+                    Mix_Volume(-1, MIX_MAX_VOLUME);
+                    OSDset("unmute");
+                }
+            }
             break;
         }
     }
@@ -365,7 +376,8 @@ void Destroy()
     }
     if (font)
     {
-        SDL_DestroySurface(font);
+        // This causes a crash. Why?!
+        //SDL_DestroySurface(font);
     }
     if (frame)
     {
@@ -375,6 +387,7 @@ void Destroy()
     {
         SDL_DestroyTexture(SDL_screen);
     }
+
     for (int i = 0; i < (sizeof(snd))/(sizeof(*snd)); i++)
     {
         if (snd[i])
