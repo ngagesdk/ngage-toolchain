@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <time.h>
 #include "SDL3/SDL.h"
+#include "SDL3_mixer/SDL_mixer.h"
 #include "celeste_SDL3.h"
 #include "celeste.h"
 #include "tilemap.h"
@@ -24,6 +25,10 @@ static SDL_Texture* frame = NULL;
 static SDL_Surface* screen = NULL;
 static SDL_Surface* gfx = NULL;
 static SDL_Surface* font = NULL;
+static Mix_Chunk* snd[64] = { NULL };
+#if ENABLE_MUSIC
+static Mix_Music* mus[6] = { NULL };
+#endif
 
 static const SDL_Color base_palette_colors[16] =
 {
@@ -56,9 +61,8 @@ static _Bool enable_screenshake = 1;
 static _Bool paused= 0;
 static void* initial_game_state = NULL;
 static void* game_state = NULL;
-#if CELESTE_P8_ENABLE_AUDIO
-static Mix_Music* game_state_music   = NULL;
-#endif
+static Mix_Music* current_music = NULL;
+static Mix_Music* game_state_music = NULL;
 
 // On-screen display (for info, such as loading a state, toggling screenshake, toggling fullscreen, etc).
 static char osd_text[200] = "";
@@ -106,6 +110,16 @@ int Init()
         return false;
     }
 
+    SDL_AudioSpec spec;
+    spec.channels = 1;
+    spec.format = SDL_AUDIO_S16;
+    spec.freq = 8000;
+
+    if (!Mix_OpenAudio(0, &spec))
+    {
+        SDL_Log("Mix_Init: %s", SDL_GetError());
+    }
+
     ResetPalette();
     SDL_HideCursor();
 
@@ -127,7 +141,7 @@ int Init()
     Celeste_P8_init();
 
     char tmpath[256];
-    SDL_snprintf(tmpath, sizeof tmpath, "%sframe.bmp", SDL_GetBasePath());
+    SDL_snprintf(tmpath, sizeof(tmpath), "%sframe.bmp", SDL_GetBasePath());
 
     SDL_Surface* frame_sf = SDL_LoadBMP(tmpath);
     if (!frame_sf)
@@ -171,18 +185,20 @@ SDL_AppResult HandleEvents(SDL_Event* ev)
 
             if (ev->key.key == SDLK_SOFTRIGHT) // Do pause.
             {
-#if CELESTE_P8_ENABLE_AUDIO
                 if (paused)
                 {
                     Mix_Resume(-1);
+#if ENABLE_MUSIC
                     Mix_ResumeMusic();
+#endif
                 }
                 else
                 {
                     Mix_Pause(-1);
+#if ENABLE_MUSIC
                     Mix_PauseMusic();
-                }
 #endif
+                }
                 paused = !paused;
             }
             else if (ev->key.key == SDLK_SOFTLEFT) // Exit.
@@ -200,9 +216,8 @@ SDL_AppResult HandleEvents(SDL_Event* ev)
                 {
                     OSDset("save state");
                     Celeste_P8_save_state(game_state);
-#if CELESTE_P8_ENABLE_AUDIO
                     game_state_music = current_music;
-#endif
+
                     char tmpath[256];
                     SDL_snprintf(tmpath, sizeof(tmpath), "%sceleste.sav", SDL_GetUserFolder(SDL_FOLDER_SAVEDGAMES));
                     FILE* savefile = fopen(tmpath, "wb+");
@@ -239,26 +254,28 @@ SDL_AppResult HandleEvents(SDL_Event* ev)
                 if (game_state)
                 {
                     OSDset("load state");
-#if CELESTE_P8_ENABLE_AUDIO
                     if (paused)
                     {
                         paused = 0;
                         Mix_Resume(-1);
+#if ENABLE_MUSIC
                         Mix_ResumeMusic();
-                    }
 #endif
+                    }
                     Celeste_P8_load_state(game_state);
-#if CELESTE_P8_ENABLE_AUDIO
                     if (current_music != game_state_music)
                     {
+#if ENABLE_MUSIC
                         Mix_HaltMusic();
+#endif
                         current_music = game_state_music;
                         if (game_state_music)
                         {
+#if ENABLE_MUSIC
                             Mix_PlayMusic(game_state_music, -1);
+#endif
                         }
                     }
-#endif
                 }
             }
             else if (ev->key.key == SDLK_3) // Toggle screenshake.
@@ -291,8 +308,8 @@ int Iterate()
             paused = 0;
             Celeste_P8_load_state(initial_game_state);
             Celeste_P8_set_rndseed((unsigned)(time(NULL) + SDL_GetTicks()));
-#if CELESTE_P8_ENABLE_AUDIO
             Mix_HaltChannel(-1);
+#if ENABLE_MUSIC
             Mix_HaltMusic();
 #endif
             Celeste_P8_init();
@@ -358,25 +375,25 @@ void Destroy()
     {
         SDL_DestroyTexture(SDL_screen);
     }
-#if CELESTE_P8_ENABLE_AUDIO
-    for (i = 0; i < (sizeof snd)/(sizeof *snd); i++)
+    for (int i = 0; i < (sizeof(snd))/(sizeof(*snd)); i++)
     {
         if (snd[i])
         {
             Mix_FreeChunk(snd[i]);
         }
     }
-    for (i = 0; i < (sizeof mus)/(sizeof *mus); i++)
+#if ENABLE_MUSIC
+    for (int i = 0; i < (sizeof(mus))/(sizeof(*mus)); i++)
     {
         if (mus[i])
         {
             Mix_FreeMusic(mus[i]);
         }
     }
+#endif
 
     Mix_CloseAudio();
     Mix_Quit();
-#endif
 }
 
 static void Flip()
@@ -393,10 +410,10 @@ static void Flip()
 
 static void LoadData(void)
 {
-#if CELESTE_P8_ENABLE_AUDIO
     static const char sndids[] = { 0,1,2,3,4,5,6,7,8,9,13,14,15,16,23,35,37,38,40,50,51,54,55 };
-    static const char musids[] = { 0,10,20,30,40 };
     int iid;
+#ifdef ENABLE_MUSIC
+    static const char musids[] = { 0,10,20,30,40 };
 #endif
     LOGLOAD("gfx.bmp");
     loadbmpscale("gfx.bmp", &gfx);
@@ -406,8 +423,7 @@ static void LoadData(void)
     loadbmpscale("font.bmp", &font);
     LOGDONE();
 
-#if CELESTE_P8_ENABLE_AUDIO
-    for (iid = 0; iid < sizeof sndids; iid++)
+    for (iid = 0; iid < sizeof(sndids); iid++)
     {
         int  id = sndids[iid];
         char fname[20];
@@ -415,16 +431,17 @@ static void LoadData(void)
 
         SDL_snprintf(fname, 20, "snd%i.wav", id);
         LOGLOAD(fname);
-        SDL_snprintf("%s%s", SDL_GetBasePath(), fname);
+        SDL_snprintf(path, 256, "%s%s", SDL_GetBasePath(), fname);
         snd[id] = Mix_LoadWAV(path);
         if (!snd[id])
         {
-            ErrLog("snd%i: Mix_LoadWAV: %s\n", id, Mix_GetError());
+            SDL_Log("snd%i: Mix_LoadWAV: %s", id, SDL_GetError());
         }
         LOGDONE();
     }
 
-    for (iid = 0; iid < sizeof musids; iid++)
+#if ENABLE_MUSIC
+    for (iid = 0; iid < sizeof(musids); iid++)
     {
         int  id = musids[iid];
         char fname[20];
@@ -432,11 +449,11 @@ static void LoadData(void)
 
         SDL_snprintf(fname, 20, "mus%i.ogg", id);
         LOGLOAD(fname);
-        SDL_snprintf("%s%s", SDL_GetBasePath(), fname);
+        SDL_snprintf(path, 256, "%s%s", SDL_GetBasePath(), fname);
         mus[id / 10] = Mix_LoadMUS(path);
         if (!mus[id / 10])
         {
-            ErrLog("mus%i: Mix_LoadMUS: %s\n", id, Mix_GetError());
+            SDL_Log("mus%i: Mix_LoadMUS: %s", id, SDL_GetError());
         }
         LOGDONE();
     }
@@ -467,8 +484,8 @@ static void OSDset(const char* fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
-    SDL_vsnprintf(osd_text, sizeof osd_text, fmt, ap);
-    osd_text[sizeof osd_text - 1] = '\0'; // Make sure to add NUL terminator in case of truncation.
+    SDL_vsnprintf(osd_text, sizeof(osd_text), fmt, ap);
+    osd_text[sizeof(osd_text) - 1] = '\0'; // Make sure to add NUL terminator in case of truncation.
     SDL_Log("%s", osd_text);
     osd_timer = 30;
     va_end(ap);
@@ -513,7 +530,7 @@ static int pico8emu(CELESTE_P8_CALLBACK_TYPE call, ...)
     {
         case CELESTE_P8_MUSIC: //music(idx,fade,mask)
         {
-#if CELESTE_P8_ENABLE_AUDIO
+#if ENABLE_MUSIC
             int index = INT_ARG();
             int fade = INT_ARG();
             int mask = INT_ARG();
@@ -576,14 +593,12 @@ static int pico8emu(CELESTE_P8_CALLBACK_TYPE call, ...)
         }
         case CELESTE_P8_SFX: //sfx(id)
         {
-#if CELESTE_P8_ENABLE_AUDIO
             int id = INT_ARG();
 
-            if (id < (sizeof snd) / (sizeof * snd) && snd[id])
+            if (id < (sizeof(snd)) / (sizeof(*snd)) && snd[id])
             {
                 Mix_PlayChannel(-1, snd[id], 0);
             }
-#endif
             break;
         }
         case CELESTE_P8_PAL: //pal(a,b)
@@ -834,7 +849,7 @@ static void loadbmpscale(char* filename, SDL_Surface** s)
         SDL_DestroySurface(surf), surf = *s = NULL;
     }
 
-    SDL_snprintf(tmpath, sizeof tmpath, "%s%s", SDL_GetBasePath(), filename);
+    SDL_snprintf(tmpath, sizeof(tmpath), "%s%s", SDL_GetBasePath(), filename);
 
     bmp = SDL_LoadBMP(tmpath);
     if (!bmp)

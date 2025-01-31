@@ -26,7 +26,8 @@ set(GCC_MODE_DEFS -DNDEBUG -D_UNICODE)
 set(GCC_DEFS ${GCC_COMN_DEFS} ${GCC_MODE_DEFS})
 
 set(game_static_libs
-    ${CMAKE_CURRENT_SOURCE_DIR}/lib/libSDL3.a)
+    ${CMAKE_CURRENT_SOURCE_DIR}/lib/libSDL3.a
+    ${CMAKE_CURRENT_SOURCE_DIR}/lib/libSDL3_mixer.a)
 
 set(game_libs
     ${EPOC_LIB}/NRenderer.lib
@@ -102,7 +103,8 @@ target_include_directories(
   game
   PUBLIC
   ${SRC_DIR}
-  ${SRC_DIR}/SDL3)
+  ${SRC_DIR}/SDL3
+  ${SRC_DIR}/SDL3_mixer)
 
 add_dependencies(
   celeste.app
