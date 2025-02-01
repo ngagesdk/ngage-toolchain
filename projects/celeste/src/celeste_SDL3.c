@@ -146,7 +146,7 @@ int Init()
     SDL_Surface* frame_sf = SDL_LoadBMP(tmpath);
     if (!frame_sf)
     {
-        SDL_Log("Failed to load image: frame.bmp", SDL_GetError());
+        SDL_Log("Failed to load image frame.bmp: %s", SDL_GetError());
         return false;
     }
     else
@@ -306,7 +306,6 @@ int Iterate()
     int numkeys;
     const bool* kbstate = SDL_GetKeyboardState(&numkeys);
     static int reset_input_timer  = 0;
-    Uint16 prev_buttons_state = buttons_state;
 
     // Hold C (backspace) to reset.
     if (initial_game_state != NULL && kbstate[SDL_SCANCODE_BACKSPACE])
@@ -331,7 +330,6 @@ int Iterate()
         reset_input_timer = 0;
     }
 
-    prev_buttons_state = buttons_state;
     buttons_state = 0;
 
     if (kbstate[SDL_SCANCODE_LEFT])  buttons_state |= (1 << 0);
