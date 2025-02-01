@@ -867,7 +867,7 @@ static void loadbmpscale(char* filename, SDL_Surface** s)
     bmp = SDL_LoadBMP(tmpath);
     if (!bmp)
     {
-        SDL_Log("Error loading bmp '%s': %s\n", filename, SDL_GetError());
+        SDL_Log("Error loading bmp '%s': %s", filename, SDL_GetError());
         return;
     }
 
