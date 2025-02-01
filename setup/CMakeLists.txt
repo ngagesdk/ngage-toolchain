@@ -19,7 +19,7 @@ project(setup)
 include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
 
 ExternalProject_Add(apps
-    URL https://media.githubusercontent.com/media/ngagesdk/ngagesdk.github.io/master/files/apps.zip
+    URL https://github.com/mupfdev/mupfdev.github.io/raw/refs/heads/main/ngagesdk/apps.zip
     URL_HASH SHA1=6e89e554dd502e5b739230ccf2f7c43703867b61
     DOWNLOAD_DIR ${SDK_DIR}/cache
     DOWNLOAD_NO_PROGRESS true
@@ -29,8 +29,19 @@ ExternalProject_Add(apps
     BUILD_COMMAND cmake -E echo "Skipping build step."
     INSTALL_COMMAND cmake -E echo "Skipping install step.")
 
+ExternalProject_Add(extras
+    URL https://github.com/mupfdev/mupfdev.github.io/raw/refs/heads/main/ngagesdk/extras.zip
+    URL_HASH SHA1=f5128881b77aaa3fcbe86d602629e51901a3e3b8
+    DOWNLOAD_DIR ${SDK_DIR}/cache
+    DOWNLOAD_NO_PROGRESS true
+    TLS_VERIFY true
+    SOURCE_DIR ${SDK_DIR}/extras
+    BUILD_BYPRODUCTS ${SDK_DIR}/extras/lib/libSDL3.a
+    BUILD_COMMAND cmake -E echo "Skipping build step."
+    INSTALL_COMMAND cmake -E echo "Skipping install step.")
+
 ExternalProject_Add(sdk
-    URL https://media.githubusercontent.com/media/ngagesdk/ngagesdk.github.io/master/files/sdk.zip
+    URL https://github.com/mupfdev/mupfdev.github.io/raw/refs/heads/main/ngagesdk/sdk.zip
     URL_HASH SHA1=556b8225ab781e507bf7acd5c9de271918972b28
     DOWNLOAD_DIR ${SDK_DIR}/cache
     DOWNLOAD_NO_PROGRESS true
@@ -41,7 +52,7 @@ ExternalProject_Add(sdk
     INSTALL_COMMAND cmake -E echo "Skipping install step.")
 
 ExternalProject_Add(tools
-    URL https://media.githubusercontent.com/media/ngagesdk/ngagesdk.github.io/master/files/tools.zip
+    URL https://github.com/mupfdev/mupfdev.github.io/raw/refs/heads/main/ngagesdk/tools.zip
     URL_HASH SHA1=a8e1ef7fb9dee6860b616c4348dc13838d6da3e6
     DOWNLOAD_DIR ${SDK_DIR}/cache
     DOWNLOAD_NO_PROGRESS true

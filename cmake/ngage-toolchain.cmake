@@ -12,7 +12,7 @@ set(SDK_ROOT ${NGAGESDK}/sdk)
 set(S60_SDK_ROOT ${SDK_ROOT}/sdk/6.1)
 set(EPOC_PLATFORM ${S60_SDK_ROOT}/Shared/EPOC32)
 set(EPOC_LIB ${S60_SDK_ROOT}/Series60/Epoc32/Release/armi/urel)
-set(EXTRA_LIB ${SDK_ROOT}/extras/lib)
+set(EPOC_EXTRAS ${SDK_ROOT}/extras)
 
 set(CMAKE_C_COMPILER ${EPOC_PLATFORM}/ngagesdk/bin/arm-epoc-pe-gcc.exe)
 set(CMAKE_CXX_COMPILER ${EPOC_PLATFORM}/gcc/bin/g++.exe)
@@ -43,9 +43,12 @@ add_compile_definitions(
 include_directories(
   SYSTEM
   ${EPOC_PLATFORM}/include
+  ${EPOC_EXTRAS}/include
   ${S60_SDK_ROOT}/Series60/Epoc32/Include
   ${S60_SDK_ROOT}/Series60/Epoc32/Include/libc
-  ${S60_SDK_ROOT}/Shared/EPOC32/ngagesdk/include)
+  ${S60_SDK_ROOT}/Shared/EPOC32/ngagesdk/include
+
+)
 
 set(DEBUG_FLAGS "-save-temps")
 set(CORE_FLAGS "-s -fomit-frame-pointer -O2 -mthumb-interwork -pipe -nostdinc -Wall -Wno-unknown-pragmas -Wno-switch -mstructure-size-boundary=8")

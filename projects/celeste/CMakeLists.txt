@@ -22,26 +22,26 @@ set(UID1 0x1000007a) # KExecutableImageUidValue, e32uid.h
 set(UID2 0x100039ce) # KAppUidValue16, apadef.h
 
 set(game_static_libs
-    ${CMAKE_CURRENT_SOURCE_DIR}/lib/libSDL3.a
-    ${CMAKE_CURRENT_SOURCE_DIR}/lib/libSDL3_mixer.a)
+  ${EPOC_EXTRAS}/lib/libSDL3.a
+  ${EPOC_EXTRAS}/lib/libSDL3_mixer.a)
 
 set(game_libs
-    ${EPOC_LIB}/NRenderer.lib
-    ${EPOC_LIB}/3dtypes.a
-    ${EPOC_LIB}/cone.lib
-    ${EPOC_PLATFORM}/gcc/lib/gcc-lib/arm-epoc-pe/2.9-psion-98r2/libgcc.a
-    ${EPOC_PLATFORM}/ngagesdk/lib/gcc/arm-epoc-pe/4.6.4/libgcc_ngage.a
-    ${EPOC_LIB}/mediaclientaudiostream.lib
-    ${EPOC_LIB}/charconv.lib
-    ${EPOC_LIB}/bitgdi.lib
-    ${EPOC_LIB}/euser.lib
-    ${EPOC_LIB}/estlib.lib
-    ${EPOC_LIB}/ws32.lib
-    ${EPOC_LIB}/hal.lib
-    ${EPOC_LIB}/fbscli.lib
-    ${EPOC_LIB}/efsrv.lib
-    ${EPOC_LIB}/scdv.lib
-    ${EPOC_LIB}/gdi.lib)
+  ${EPOC_LIB}/NRenderer.lib
+  ${EPOC_LIB}/3dtypes.a
+  ${EPOC_LIB}/cone.lib
+  ${EPOC_PLATFORM}/gcc/lib/gcc-lib/arm-epoc-pe/2.9-psion-98r2/libgcc.a
+  ${EPOC_PLATFORM}/ngagesdk/lib/gcc/arm-epoc-pe/4.6.4/libgcc_ngage.a
+  ${EPOC_LIB}/mediaclientaudiostream.lib
+  ${EPOC_LIB}/charconv.lib
+  ${EPOC_LIB}/bitgdi.lib
+  ${EPOC_LIB}/euser.lib
+  ${EPOC_LIB}/estlib.lib
+  ${EPOC_LIB}/ws32.lib
+  ${EPOC_LIB}/hal.lib
+  ${EPOC_LIB}/fbscli.lib
+  ${EPOC_LIB}/efsrv.lib
+  ${EPOC_LIB}/scdv.lib
+  ${EPOC_LIB}/gdi.lib)
 
 set(celeste_libs
   ${EPOC_LIB}/euser.lib
@@ -91,9 +91,7 @@ target_compile_definitions(
 target_include_directories(
   game
   PUBLIC
-  ${SRC_DIR}
-  ${SRC_DIR}/SDL3
-  ${SRC_DIR}/SDL3_mixer)
+  ${SRC_DIR})
 
 add_dependencies(
   celeste.app
@@ -104,7 +102,6 @@ target_compile_definitions(
   PUBLIC
   __DLL__
   APP_NAME=${APP_NAME}
-  ${GCC_DEFS}
   UID1=${UID1}
   UID2=${UID2}
   UID3=${APP_UID})
