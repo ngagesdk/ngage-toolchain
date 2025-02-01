@@ -15,3 +15,5 @@ You can find the more portable SDL2 version here:
 
 All credit for the original game goes to the original developers (Maddy
 Thorson & Noel Berry).
+
+Custom cover art and MMC label by [PocketsUke](https://pocketsuke.co.uk/).
