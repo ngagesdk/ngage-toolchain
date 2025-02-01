@@ -44,7 +44,8 @@ include_directories(
   SYSTEM
   ${EPOC_PLATFORM}/include
   ${S60_SDK_ROOT}/Series60/Epoc32/Include
-  ${S60_SDK_ROOT}/Series60/Epoc32/Include/libc)
+  ${S60_SDK_ROOT}/Series60/Epoc32/Include/libc
+  ${S60_SDK_ROOT}/Shared/EPOC32/ngagesdk/include)
 
 set(DEBUG_FLAGS "-save-temps")
 set(CORE_FLAGS "-s -fomit-frame-pointer -O2 -mthumb-interwork -pipe -nostdinc -Wall -Wno-unknown-pragmas -Wno-switch -mstructure-size-boundary=8")
