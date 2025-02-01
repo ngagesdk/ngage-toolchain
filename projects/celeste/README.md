@@ -11,6 +11,11 @@ example project.
 You can find the more portable SDL2 version here:
 [ngagesdk/ccleste](https://github.com/ngagesdk/ccleste).
 
+## Download
+
+The latest build can be found here in the [media](media/) subdirectory
+within this repository.
+
 ## Credits
 
 All credit for the original game goes to the original developers (Maddy

@@ -31,7 +31,7 @@ ExternalProject_Add(apps
 
 ExternalProject_Add(extras
     URL https://github.com/mupfdev/mupfdev.github.io/raw/refs/heads/main/ngagesdk/extras.zip
-    URL_HASH SHA1=f5128881b77aaa3fcbe86d602629e51901a3e3b8
+    URL_HASH SHA1=2cc27486ef5cecca1d4b230cf1fa9ee31fc36390
     DOWNLOAD_DIR ${SDK_DIR}/cache
     DOWNLOAD_NO_PROGRESS true
     TLS_VERIFY true
