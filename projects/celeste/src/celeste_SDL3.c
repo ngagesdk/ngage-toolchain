@@ -141,7 +141,7 @@ int Init()
     Celeste_P8_init();
 
     char tmpath[256];
-    SDL_snprintf(tmpath, sizeof(tmpath), "%sframe.bmp", SDL_GetBasePath());
+    SDL_snprintf(tmpath, sizeof(tmpath), "%sdata/frame.bmp", SDL_GetBasePath());
 
     SDL_Surface* frame_sf = SDL_LoadBMP(tmpath);
     if (!frame_sf)
@@ -444,7 +444,7 @@ static void LoadData(void)
 
         SDL_snprintf(fname, 20, "snd%i.wav", id);
         LOGLOAD(fname);
-        SDL_snprintf(path, 256, "%s%s", SDL_GetBasePath(), fname);
+        SDL_snprintf(path, 256, "%sdata/%s", SDL_GetBasePath(), fname);
         snd[id] = Mix_LoadWAV(path);
         if (!snd[id])
         {
@@ -862,7 +862,7 @@ static void loadbmpscale(char* filename, SDL_Surface** s)
         SDL_DestroySurface(surf), surf = *s = NULL;
     }
 
-    SDL_snprintf(tmpath, sizeof(tmpath), "%s%s", SDL_GetBasePath(), filename);
+    SDL_snprintf(tmpath, sizeof(tmpath), "%sdata/%s", SDL_GetBasePath(), filename);
 
     bmp = SDL_LoadBMP(tmpath);
     if (!bmp)

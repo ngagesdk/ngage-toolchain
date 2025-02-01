@@ -21,10 +21,6 @@ add_compile_definitions(__NGAGE__)
 set(UID1 0x1000007a) # KExecutableImageUidValue, e32uid.h
 set(UID2 0x100039ce) # KAppUidValue16, apadef.h
 
-set(GCC_COMN_DEFS -D__SYMBIAN32__ -D__GCC32__ -D__EPOC32__ -D__MARM__ -D__MARM_ARMI__)
-set(GCC_MODE_DEFS -DNDEBUG -D_UNICODE)
-set(GCC_DEFS ${GCC_COMN_DEFS} ${GCC_MODE_DEFS})
-
 set(game_static_libs
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/libSDL3.a
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/libSDL3_mixer.a)
@@ -88,16 +84,9 @@ target_compile_definitions(
   game
   PUBLIC
   __EXE__
-  FUNCTION_NAME=__FUNCTION__
-  ${GCC_DEFS}
   UID1=${UID1}
   UID2=${UID2}
   UID3=${UID3})
-
-target_compile_options(
-  game
-  PUBLIC
-  -O2)
 
 target_include_directories(
   game
@@ -119,11 +108,6 @@ target_compile_definitions(
   UID1=${UID1}
   UID2=${UID2}
   UID3=${APP_UID})
-
-target_compile_options(
-  celeste
-  PUBLIC
-  -O3)
 
 target_include_directories(
   celeste
