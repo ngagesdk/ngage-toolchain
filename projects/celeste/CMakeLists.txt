@@ -23,7 +23,7 @@ set(UID2 0x100039ce) # KAppUidValue16, apadef.h
 
 set(game_static_libs
   ${EPOC_EXTRAS}/lib/libSDL3.a
-  ${CMAKE_CURRENT_SOURCE_DIR}/lib2/libSDL3_mixer.a)
+  ${EPOC_EXTRAS}/lib/libSDL3_mixer.a)
 
 set(game_libs
   ${EPOC_LIB}/NRenderer.lib
