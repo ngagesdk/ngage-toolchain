@@ -1,3 +1,8 @@
+*.dll
+*.exe
+*.bas
+*.map
 .vs
 out
 cpp.exe.core
+__pycache__
