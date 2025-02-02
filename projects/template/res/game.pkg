@@ -1,0 +1,16 @@
+; game.pkg
+;
+;Language - standard language definitions
+&EN
+
+; standard SIS file header
+#{"SDL3"},(0x10005777),1,0,0
+
+;Supports Series 60 v 0.9
+(0x101F6F88), 0, 0, 0, {"Series60ProductID"}
+
+;
+"..\out\build\N-Gage\game.exe"-"E:\System\Apps\template\game.exe"
+"..\out\build\N-Gage\template.app"-"E:\System\Apps\template\template.app"
+"..\out\build\N-Gage\template.rsc"-"E:\System\Apps\template\template.rsc"
+"..\out\build\N-Gage\template.aif"-"E:\System\Apps\template\template.aif"

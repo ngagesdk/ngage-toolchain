@@ -1,0 +1,29 @@
+/* @file template.rss
+ *
+ */
+
+NAME NWIZ
+
+#include <eikon.rh>
+#include <avkon.rsg>
+#include <avkon.rh>
+#include <avkon.mbg>
+#include <avkon.loc>
+
+RESOURCE RSS_SIGNATURE {}
+
+RESOURCE TBUF
+{
+    buf = APP_NAME;
+}
+
+RESOURCE EIK_APP_INFO
+{
+    status_pane = r_status_pane_none;
+    cba = R_AVKON_SOFTKEYS_BACK;
+}
+
+RESOURCE STATUS_PANE_APP_MODEL r_status_pane_none
+{
+    layout = R_AVKON_STATUS_PANE_LAYOUT_EMPTY;
+}
