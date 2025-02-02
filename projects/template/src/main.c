@@ -35,7 +35,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 
     // I recommend initialising the audio device in any case,
     // even if you don't need it. The backend is started at a
-    // lower level and this ensures that everything is terminated
+    // higher level and this ensures that everything is terminated
     // properly.
     SDL_AudioSpec spec;
     spec.channels = 1;
