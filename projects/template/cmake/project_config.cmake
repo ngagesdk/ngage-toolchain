@@ -5,3 +5,4 @@ set(project_sources
 
 set(UID3 0x1000c37e) # game.exe UID
 set(APP_UID 0x10005777) # template.app UID
+set(APP_NAME "template")
