@@ -6,9 +6,13 @@ A C/C++ homebrew toolchain for the Nokia N-Gage.
 
 ## What is this all about?
 
-This toolchain is the heart of the Nokia N-Gage SDK project. A development
-environment for the easy development of homebrew software for the Nokia
-N-Gage using modern tools such as CMake and Visual Studio 2022.
+This toolchain is the heart of the Nokia N-Gage SDK project.
+
+The project provides a collection of tools, libraries, and
+documentation that allows to develop homebrew software for the
+Nokia N-Gage.  It includes a C/C++ toolchain, a collection of
+example applications, and a set of libraries that are compatible
+with the N-Gage's hardware. 
 
 ## The problem
 
@@ -44,8 +48,7 @@ properly, be sure to use slashes instead of backslashes,
 e.g. `C:/ngage-toolchain`.
 
 Once you are done, open the `setup` directory in Visual Studio and wait
-until the CMake solution has finished generating.  Then build the
-project so that the necessary dependencies are downloaded and installed.
+until the CMake solution has finished generating.  That's it.
 
 ### Important
 
