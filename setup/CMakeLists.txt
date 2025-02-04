@@ -18,6 +18,13 @@ project(setup)
 
 include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
 
+FetchContent_Declare(sdk
+  GIT_REPOSITORY https://github.com/ngagesdk/sdk.git
+  GIT_TAG main
+  SOURCE_DIR ${SDK_DIR})
+
+FetchContent_MakeAvailable(sdk)
+
 ExternalProject_Add(apps
     URL https://github.com/mupfdev/mupfdev.github.io/raw/refs/heads/main/ngagesdk/apps.zip
     URL_HASH SHA1=6e89e554dd502e5b739230ccf2f7c43703867b61
@@ -37,17 +44,6 @@ ExternalProject_Add(extras
     TLS_VERIFY true
     SOURCE_DIR ${SDK_DIR}/extras
     BUILD_BYPRODUCTS ${SDK_DIR}/extras/lib/libSDL3.a
-    BUILD_COMMAND cmake -E echo "Skipping build step."
-    INSTALL_COMMAND cmake -E echo "Skipping install step.")
-
-ExternalProject_Add(sdk
-    URL https://github.com/mupfdev/mupfdev.github.io/raw/refs/heads/main/ngagesdk/sdk.zip
-    URL_HASH SHA1=556b8225ab781e507bf7acd5c9de271918972b28
-    DOWNLOAD_DIR ${SDK_DIR}/cache
-    DOWNLOAD_NO_PROGRESS true
-    TLS_VERIFY true
-    SOURCE_DIR ${SDK_DIR}/sdk
-    BUILD_BYPRODUCTS ${SDK_DIR}/sdk/6.1/Shared/EPOC32/gcc/bin/gcc.exe
     BUILD_COMMAND cmake -E echo "Skipping build step."
     INSTALL_COMMAND cmake -E echo "Skipping install step.")
 
