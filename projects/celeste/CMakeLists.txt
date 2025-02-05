@@ -6,13 +6,6 @@ cmake_minimum_required(VERSION 3.10)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-if(DEFINED ENV{NGAGESDK})
-  set(NGAGESDK $ENV{NGAGESDK})
-  set(CMAKE_TOOLCHAIN_FILE ${NGAGESDK}/cmake/ngage-toolchain.cmake)
-else()
-  message(FATAL_ERROR "The environment variable NGAGESDK needs to be defined.")
-endif()
-
 project(game C CXX)
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/project_config.cmake)
 
@@ -22,8 +15,8 @@ set(UID1 0x1000007a) # KExecutableImageUidValue, e32uid.h
 set(UID2 0x100039ce) # KAppUidValue16, apadef.h
 
 set(game_static_libs
-  ${EPOC_EXTRAS}/lib/armi/urel/SDL3.lib
-  ${EPOC_EXTRAS}/lib/armi/urel/SDL3_mixer.lib)
+  ${CMAKE_CURRENT_SOURCE_DIR}/lib/libSDL3.a
+  ${CMAKE_CURRENT_SOURCE_DIR}/lib2/libSDL3_mixer.a)
 
 set(game_libs
   ${EPOC_LIB}/NRenderer.lib

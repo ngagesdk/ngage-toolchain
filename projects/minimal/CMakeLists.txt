@@ -1,12 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
 
-if(DEFINED ENV{NGAGESDK})
-  set(NGAGESDK $ENV{NGAGESDK})
-  set(CMAKE_TOOLCHAIN_FILE ${NGAGESDK}/cmake/ngage-toolchain.cmake)
-else()
-  message(FATAL_ERROR "The environment variable NGAGESDK needs to be defined.")
-endif()
-
 project(minimal C CXX)
 
 set(minimal_sources
