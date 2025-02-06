@@ -17,17 +17,10 @@ FetchContent_Declare(extras
   GIT_TAG main
   SOURCE_DIR ${SDK_DIR}/extras)
 
-if(UNIX)
-  FetchContent_Declare(sdk
-    GIT_REPOSITORY https://github.com/ngagesdk/sdk.git
-    GIT_TAG linux
-    SOURCE_DIR ${SDK_DIR}/sdk)
-else()
-  FetchContent_Declare(sdk
-    GIT_REPOSITORY https://github.com/ngagesdk/sdk.git
-    GIT_TAG main
-    SOURCE_DIR ${SDK_DIR}/sdk)
-endif()
+FetchContent_Declare(sdk
+  GIT_REPOSITORY https://github.com/ngagesdk/sdk.git
+  GIT_TAG main
+  SOURCE_DIR ${SDK_DIR}/sdk)
 
 FetchContent_Declare(tools
   GIT_REPOSITORY https://github.com/ngagesdk/tools.git
