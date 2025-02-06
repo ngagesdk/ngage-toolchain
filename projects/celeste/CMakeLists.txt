@@ -4,6 +4,8 @@
 
 cmake_minimum_required(VERSION 3.10)
 
+option (BUILD_CI_WORKFLOW "Build CI workflow" OFF)
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 project(game C CXX)
@@ -58,16 +60,18 @@ add_library(celeste STATIC ${celeste_sources})
 build_exe_static(game exe ${UID1} ${UID2} ${UID3} "${game_static_libs}" "${game_libs}")
 build_dll(celeste app ${UID1} ${UID2} ${APP_UID} "${celeste_libs}")
 
-build_aif(${RESOURCE_DIR} celeste ${APP_UID})
-build_resource(${RESOURCE_DIR} celeste "")
-build_sis(${RESOURCE_DIR} celeste)
+if(NOT BUILD_CI_WORKFLOW)
+  build_aif(${RESOURCE_DIR} celeste ${APP_UID})
+  build_resource(${RESOURCE_DIR} celeste "")
+  build_sis(${RESOURCE_DIR} celeste)
 
-add_dependencies(
-  celeste.sis
-  game.exe
-  celeste.aif
-  celeste.app
-  celeste.rsc)
+  add_dependencies(
+    celeste.sis
+    game.exe
+    celeste.aif
+    celeste.app
+    celeste.rsc)
+endif()
 
 add_dependencies(
   game.exe
