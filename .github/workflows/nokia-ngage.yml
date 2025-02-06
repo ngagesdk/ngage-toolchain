@@ -23,11 +23,13 @@ jobs:
         $ngagesdk = "$(pwd)/ngage-toolchain"
         $ngagesdk = $ngagesdk -replace '\\', '/'
         echo "NGAGESDK=$ngagesdk" >> $env:GITHUB_ENV
+      shell: pwsh
 
     - name: Add runtime paths to PATH
       run: |
         echo "${{ env.NGAGESDK }}/sdk/sdk/6.1/Shared/EPOC32/gcc/bin" >> $env:GITHUB_PATH
         echo "${{ env.NGAGESDK }}/sdk/sdk/6.1/Shared/EPOC32/ngagesdk/bin" >> $env:GITHUB_PATH
+      shell: pwsh
       env:
         NGAGESDK: ${{ github.workspace }}/ngage-toolchain
 
@@ -36,10 +38,12 @@ jobs:
         echo "NGAGESDK: ${{ env.NGAGESDK }}"
         ls ${{ env.NGAGESDK }}
         ls ${{ env.NGAGESDK }}/setup
+      shell: pwsh
       env:
         NGAGESDK: ${{ github.workspace }}/ngage-toolchain
 
     - name: Fetch SDK
       run: cmake -S ${{ env.NGAGESDK }}/setup -B ${{ env.NGAGESDK }}/build
+      shell: pwsh
       env:
         NGAGESDK: ${{ github.workspace }}/ngage-toolchain
