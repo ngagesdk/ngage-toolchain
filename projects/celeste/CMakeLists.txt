@@ -15,8 +15,8 @@ set(UID1 0x1000007a) # KExecutableImageUidValue, e32uid.h
 set(UID2 0x100039ce) # KAppUidValue16, apadef.h
 
 set(game_static_libs
-  ${EPOC_EXTRAS}/lib/SDL3.lib
-  ${EPOC_EXTRAS}/lib/SDL3_mixer.lib)
+  ${EPOC_EXTRAS}/lib/armi/urel/SDL3.lib
+  ${EPOC_EXTRAS}/lib/armi/urel/SDL3_mixer.lib)
 
 set(game_libs
   ${EPOC_LIB}/NRenderer.lib
