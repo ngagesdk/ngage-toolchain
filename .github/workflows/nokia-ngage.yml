@@ -15,13 +15,6 @@ jobs:
     - name: Checkout toolchain
       uses: actions/checkout@v2
 
-    - name: Install Chocolatey
-      run: |
-        Set-ExecutionPolicy Bypass -Scope Process -Force; `
-        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; `
-        iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-      shell: pwsh
-
     - name: Install Ninja
       run: choco install ninja --confirm
       shell: pwsh
@@ -59,10 +52,10 @@ jobs:
         cmake --build ${{ env.NGAGESDK }}/projects/celeste/build
       shell: pwsh
 
-    - name: Clone SDL3
+    - name: Clone Simple DirectMedia Layer 3
       run: git clone -b nokia_ngage https://github.com/ngagesdk/SDL.git
 
-    - name: Build SDL3
+    - name: Build Simple DirectMedia Layer 3
       run: |
-        cmake -G "Ninja" -S SDL -B SDL/build BUILD_FOR_NOKIA_NGAGE=ON -DCMAKE_TOOLCHAIN_FILE=${{ env.NGAGESDK }}/cmake/ngage-toolchain.cmake
+        cmake -G "Ninja" -S SDL -B SDL/build -DBUILD_FOR_NOKIA_NGAGE=ON -DCMAKE_TOOLCHAIN_FILE=${{ env.NGAGESDK }}/cmake/ngage-toolchain.cmake
         cmake --build SDL/build
