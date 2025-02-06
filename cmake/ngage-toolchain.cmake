@@ -1,7 +1,7 @@
 set(CMAKE_SYSTEM_NAME Generic)
 
 if(DEFINED ENV{NGAGESDK})
-  SET(NGAGESDK $ENV{NGAGESDK})
+  set(NGAGESDK $ENV{NGAGESDK})
 else()
   message(FATAL_ERROR "The environment variable NGAGESDK needs to be defined.")
 endif()
