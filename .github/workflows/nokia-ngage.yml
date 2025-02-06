@@ -25,12 +25,18 @@ jobs:
       run: |
         echo "${{ env.NGAGESDK }}/sdk/sdk/6.1/Shared/EPOC32/gcc/bin" >> $GITHUB_PATH
         echo "${{ env.NGAGESDK }}/sdk/sdk/6.1/Shared/EPOC32/ngagesdk/bin" >> $GITHUB_PATH
+      env:
+        NGAGESDK: ${{ github.workspace }}/ngage-toolchain
 
     - name: Verify directory structure
       run: |
         echo "NGAGESDK: ${{ env.NGAGESDK }}"
         ls ${{ env.NGAGESDK }}
         ls ${{ env.NGAGESDK }}/setup
+      env:
+        NGAGESDK: ${{ github.workspace }}/ngage-toolchain
 
     - name: Fetch SDK
       run: cmake -S ${{ env.NGAGESDK }}/setup -B ${{ env.NGAGESDK }}/build
+      env:
+        NGAGESDK: ${{ github.workspace }}/ngage-toolchain
