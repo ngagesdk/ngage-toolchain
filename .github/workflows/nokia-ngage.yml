@@ -59,3 +59,10 @@ jobs:
         cmake --build ${{ env.NGAGESDK }}/projects/celeste/build
       shell: pwsh
 
+    - name: Clone SDL3
+      run: git clone -b nokia_ngage https://github.com/ngagesdk/SDL.git
+
+    - name: Build SDL3
+      run: |
+        cmake -G "Ninja" -S SDL -B SDL/build BUILD_FOR_NOKIA_NGAGE=ON -DCMAKE_TOOLCHAIN_FILE=${{ env.NGAGESDK }}/cmake/ngage-toolchain.cmake
+        cmake --build SDL/build
