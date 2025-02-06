@@ -50,7 +50,7 @@ jobs:
       shell: pwsh
 
     - name: Fetch SDK
-      run: cmake -S ${{ env.NGAGESDK }}/setup -B ${{ env.NGAGESDK }}/build
+      run: cmake -G "Ninja" -S ${{ env.NGAGESDK }}/setup -B ${{ env.NGAGESDK }}/build
       shell: pwsh
 
     - name: Build Celeste
