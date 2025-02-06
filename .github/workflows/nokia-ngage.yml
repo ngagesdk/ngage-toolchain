@@ -19,7 +19,7 @@ jobs:
       run: git clone https://github.com/ngagesdk/ngage-toolchain.git
 
     - name: Set up NGAGESDK environment variable
-      run: echo "NGAGESDK=$(pwd)/ngage-toolchain" >> $GITHUB_ENV
+      run: echo "NGAGESDK=$(echo $(pwd)/ngage-toolchain | sed 's/\\/\//g')" >> $GITHUB_ENV
 
     - name: Add runtime paths to PATH
       run: |
@@ -40,3 +40,4 @@ jobs:
       run: cmake -S ${{ env.NGAGESDK }}/setup -B ${{ env.NGAGESDK }}/build
       env:
         NGAGESDK: ${{ github.workspace }}/ngage-toolchain
+

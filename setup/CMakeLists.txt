@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
-if(DEFINED ENV{NGAGESDK})
-    SET(NGAGESDK $ENV{NGAGESDK})
+if(defined ENV{NGAGESDK})
+    set(NGAGESDK $ENV{NGAGESDK})
 else()
     message(FATAL_ERROR "The environment variable NGAGESDK needs to be defined.")
 endif()
