@@ -19,12 +19,15 @@ jobs:
       run: git clone https://github.com/ngagesdk/ngage-toolchain.git
 
     - name: Set up NGAGESDK environment variable
-      run: echo "NGAGESDK=$(echo $(pwd)/ngage-toolchain | sed 's/\\/\//g')" >> $GITHUB_ENV
+      run: |
+        $ngagesdk = "$(pwd)/ngage-toolchain"
+        $ngagesdk = $ngagesdk -replace '\\', '/'
+        echo "NGAGESDK=$ngagesdk" >> $env:GITHUB_ENV
 
     - name: Add runtime paths to PATH
       run: |
-        echo "${{ env.NGAGESDK }}/sdk/sdk/6.1/Shared/EPOC32/gcc/bin" >> $GITHUB_PATH
-        echo "${{ env.NGAGESDK }}/sdk/sdk/6.1/Shared/EPOC32/ngagesdk/bin" >> $GITHUB_PATH
+        echo "${{ env.NGAGESDK }}/sdk/sdk/6.1/Shared/EPOC32/gcc/bin" >> $env:GITHUB_PATH
+        echo "${{ env.NGAGESDK }}/sdk/sdk/6.1/Shared/EPOC32/ngagesdk/bin" >> $env:GITHUB_PATH
       env:
         NGAGESDK: ${{ github.workspace }}/ngage-toolchain
 
@@ -40,4 +43,3 @@ jobs:
       run: cmake -S ${{ env.NGAGESDK }}/setup -B ${{ env.NGAGESDK }}/build
       env:
         NGAGESDK: ${{ github.workspace }}/ngage-toolchain
-
