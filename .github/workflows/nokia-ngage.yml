@@ -41,3 +41,9 @@ jobs:
     - name: Fetch SDK
       run: cmake -S ${{ env.NGAGESDK }}/setup -B ${{ env.NGAGESDK }}/build
       shell: pwsh
+
+    - name: Build Celeste
+      run: |
+        cmake -S ${{ env.NGAGESDK }}/projects/celeste -B ${{ env.NGAGESDK }}/projects/celeste/build -DCMAKE_TOOLCHAIN_FILE=${{ env.NGAGESDK }}/cmake/ngage-toolchain.cmake
+        cmake --build ${{ env.NGAGESDK }}/projects/celeste/build
+      shell: pwsh
