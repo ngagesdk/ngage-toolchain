@@ -15,13 +15,6 @@ jobs:
     - name: Checkout toolchain
       uses: actions/checkout@v2
 
-    - name: Install Chocolatey
-      run: |
-        Set-ExecutionPolicy Bypass -Scope Process -Force; `
-        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; `
-        iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-      shell: pwsh
-
     - name: Install Ninja
       run: choco install ninja --confirm
       shell: pwsh
@@ -31,30 +24,30 @@ jobs:
 
     - name: Set up NGAGESDK environment variable
       run: |
-        $ngagesdk = "${{ github.workspace }}/ngage-toolchain"
-        $ngagesdk = $ngagesdk -replace '\\', '/'
+        $ngagesdk = "${{ github.workspace }}\\ngage-toolchain"
         echo "NGAGESDK=$ngagesdk" >> $env:GITHUB_ENV
       shell: pwsh
 
     - name: Add runtime paths to PATH
       run: |
-        echo "${{ env.NGAGESDK }}/sdk/sdk/6.1/Shared/EPOC32/gcc/bin" >> $env:GITHUB_PATH
-        echo "${{ env.NGAGESDK }}/sdk/sdk/6.1/Shared/EPOC32/ngagesdk/bin" >> $env:GITHUB_PATH
+        echo "${{ env.NGAGESDK }}\\sdk\\sdk\\6.1\\Shared\\EPOC32\\gcc\\bin" >> $env:GITHUB_PATH
+        echo "${{ env.NGAGESDK }}\\sdk\\sdk\\6.1\\Shared\\EPOC32\\ngagesdk\\bin" >> $env:GITHUB_PATH
       shell: pwsh
 
     - name: Verify directory structure
       run: |
         echo "NGAGESDK: ${{ env.NGAGESDK }}"
         ls ${{ env.NGAGESDK }}
-        ls ${{ env.NGAGESDK }}/setup
+        ls ${{ env.NGAGESDK }}\\setup
       shell: pwsh
 
     - name: Fetch SDK
-      run: cmake -S ${{ env.NGAGESDK }}/setup -B ${{ env.NGAGESDK }}/build
+      run: cmake -S ${{ env.NGAGESDK }}\\setup -B ${{ env.NGAGESDK }}\\build
       shell: pwsh
 
     - name: Build Celeste
       run: |
-        cmake -G "Ninja" -S ${{ env.NGAGESDK }}/projects/celeste -B ${{ env.NGAGESDK }}/projects/celeste/build -DCMAKE_TOOLCHAIN_FILE=${{ env.NGAGESDK }}/cmake/ngage-toolchain.cmake
-        cmake --build ${{ env.NGAGESDK }}/projects/celeste/build
+        cmake -G "Ninja" -S ${{ env.NGAGESDK }}\\projects\\celeste -B ${{ env.NGAGESDK }}\\projects\\celeste\\build -DCMAKE_TOOLCHAIN_FILE=${{ env.NGAGESDK }}\\cmake\\ngage-toolchain.cmake
+        cmake --build ${{ env.NGAGESDK }}\\projects\\celeste\\build
       shell: pwsh
+
