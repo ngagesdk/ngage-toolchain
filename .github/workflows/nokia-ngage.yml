@@ -15,6 +15,17 @@ jobs:
     - name: Checkout toolchain
       uses: actions/checkout@v2
 
+    - name: Install Chocolatey
+      run: |
+        Set-ExecutionPolicy Bypass -Scope Process -Force; `
+        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; `
+        iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+      shell: pwsh
+
+    - name: Install Ninja
+      run: choco install ninja --confirm
+      shell: pwsh
+
     - name: Clone ngage-toolchain
       run: git clone https://github.com/ngagesdk/ngage-toolchain.git
 
@@ -44,6 +55,6 @@ jobs:
 
     - name: Build Celeste
       run: |
-        cmake -S ${{ env.NGAGESDK }}/projects/celeste -B ${{ env.NGAGESDK }}/projects/celeste/build -DCMAKE_TOOLCHAIN_FILE=${{ env.NGAGESDK }}/cmake/ngage-toolchain.cmake
+        cmake -G "Ninja" -S ${{ env.NGAGESDK }}/projects/celeste -B ${{ env.NGAGESDK }}/projects/celeste/build -DCMAKE_TOOLCHAIN_FILE=${{ env.NGAGESDK }}/cmake/ngage-toolchain.cmake
         cmake --build ${{ env.NGAGESDK }}/projects/celeste/build
       shell: pwsh
