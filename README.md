@@ -14,25 +14,6 @@ Nokia N-Gage.  It includes a C/C++ toolchain, a collection of
 example applications, and a set of libraries that are compatible
 with the N-Gage's hardware. 
 
-## The problem
-
-Developing applications for Symbian is unnecessarily complicated.  This
-was no different 20 years ago than it is today, and is certainly one of
-the main reasons why a homebrew community never emerged for the Nokia
-N-Gage.
-
-Until now, the easiest way to do this was to set up a virtual machine,
-install the SDK and a completely outdated version of Visual Studio. 
-
-In short, Symbian development has never been a convenient thing.
-
-## The solution
-
-CMake, as it allows you to automate complex build procedures very
-effortlessly and without fuss. This toolchain also includes a native
-port of Simple DirectMedia Layer 3, which eases access to audio and
-graphics, amongst other things.
-
 ## Where do I start?
 
 Clone the toolchain:
@@ -69,6 +50,9 @@ environment variable:
 
 - This project is licensed under the "The MIT License".  See the file
   [LICENSE.md](LICENSE.md) for details.
+
+- The SDK itself is from Nokia and various third-party sources.
+  These components are not subject to the terms of "The MIT License".
 
 - The [N-Gage SDK logo](media/) by [Dan Whelan](https://danwhelan.ie) is
   licensed under a Creative Commons [Attribution-ShareAlike 4.0

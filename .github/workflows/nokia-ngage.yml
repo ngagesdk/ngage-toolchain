@@ -46,16 +46,26 @@ jobs:
       run: cmake -G "Ninja" -S ${{ env.NGAGESDK }}/setup -B ${{ env.NGAGESDK }}/build
       shell: pwsh
 
+    - name: Build minimal
+      run: |
+        cmake -G "Ninja" -S ${{ env.NGAGESDK }}/projects/minimal -B ${{ env.NGAGESDK }}/projects/minimal/build -DCMAKE_TOOLCHAIN_FILE=${{ env.NGAGESDK }}/cmake/ngage-toolchain.cmake
+        cmake --build ${{ env.NGAGESDK }}/projects/minimal/build
+      shell: pwsh
+
+    - name: Build template
+      run: |
+        cmake -G "Ninja" -S ${{ env.NGAGESDK }}/projects/template -B ${{ env.NGAGESDK }}/projects/template/build -DBUILD_CI_WORKFLOW=ON -DCMAKE_TOOLCHAIN_FILE=${{ env.NGAGESDK }}/cmake/ngage-toolchain.cmake
+        cmake --build ${{ env.NGAGESDK }}/projects/template/build
+      shell: pwsh
+
     - name: Build Celeste
       run: |
         cmake -G "Ninja" -S ${{ env.NGAGESDK }}/projects/celeste -B ${{ env.NGAGESDK }}/projects/celeste/build -DBUILD_CI_WORKFLOW=ON -DCMAKE_TOOLCHAIN_FILE=${{ env.NGAGESDK }}/cmake/ngage-toolchain.cmake
         cmake --build ${{ env.NGAGESDK }}/projects/celeste/build
       shell: pwsh
 
-    - name: Clone Simple DirectMedia Layer 3
-      run: git clone -b nokia_ngage https://github.com/ngagesdk/SDL.git
-
     - name: Build Simple DirectMedia Layer 3
       run: |
+        git clone -b nokia_ngage https://github.com/ngagesdk/SDL.git
         cmake -G "Ninja" -S SDL -B SDL/build -DBUILD_FOR_NOKIA_NGAGE=ON -DCMAKE_TOOLCHAIN_FILE=${{ env.NGAGESDK }}/cmake/ngage-toolchain.cmake
         cmake --build SDL/build

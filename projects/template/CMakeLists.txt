@@ -4,6 +4,8 @@
 
 cmake_minimum_required(VERSION 3.10)
 
+option (BUILD_CI_WORKFLOW "Build CI workflow" OFF)
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 project(game C CXX)
@@ -55,16 +57,18 @@ add_library(template STATIC ${template_sources})
 build_exe_static(game exe ${UID1} ${UID2} ${UID3} "${game_static_libs}" "${game_libs}")
 build_dll(template app ${UID1} ${UID2} ${APP_UID} "${template_libs}")
 
-build_aif(${CMAKE_CURRENT_SOURCE_DIR}/res template ${APP_UID})
-build_resource(${CMAKE_CURRENT_SOURCE_DIR}/res template "")
-build_sis(${CMAKE_CURRENT_SOURCE_DIR}/res game)
+if(NOT BUILD_CI_WORKFLOW)
+  build_aif(${CMAKE_CURRENT_SOURCE_DIR}/res template ${APP_UID})
+  build_resource(${CMAKE_CURRENT_SOURCE_DIR}/res template "")
+  build_sis(${CMAKE_CURRENT_SOURCE_DIR}/res game)
 
-add_dependencies(
-  game.sis
-  game.exe
-  template.app
-  template.aif
-  template.rsc)
+  add_dependencies(
+    game.sis
+    game.exe
+    template.app
+    template.aif
+    template.rsc)
+endif()
 
 add_dependencies(
   game.exe
