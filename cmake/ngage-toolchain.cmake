@@ -133,7 +133,6 @@ macro(add_executable target)
   add_dependencies(
     ${target}.exe
     ${target})
-
 endmacro()
 
 function(build_dll source file_ext uid1 uid2 uid3 libs)
