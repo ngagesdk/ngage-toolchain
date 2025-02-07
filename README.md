@@ -2,6 +2,8 @@
 
 # ngage-toolchain
 
+[![Continuous Integration](https://github.com/ngagesdk/ngage-toolchain/actions/workflows/nokia-ngage.yml/badge.svg)](https://github.com/ngagesdk/ngage-toolchain/actions/workflows/nokia-ngage.yml)
+
 A C/C++ homebrew toolchain for the Nokia N-Gage.
 
 ## What is this all about?
