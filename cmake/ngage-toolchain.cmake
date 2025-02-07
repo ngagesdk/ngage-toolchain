@@ -98,8 +98,6 @@ cmake_policy(SET CMP0053 NEW)  # Ensures proper argument parsing.
 
 # Experimental add_executable() replacement to build SDL3 examples.
 macro(add_executable target)
-  message(STATUS "Custom add_executable invoked for: ${target}")
-
   add_library(${target} STATIC ${ARGN})
 
   set(UID1 0x1000007a) # KExecutableImageUidValue, e32uid.h
