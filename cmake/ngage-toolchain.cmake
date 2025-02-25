@@ -96,43 +96,6 @@ endfunction()
 
 cmake_policy(SET CMP0053 NEW)  # Ensures proper argument parsing.
 
-# Experimental add_executable() replacement to build SDL3 examples.
-macro(add_executable target)
-  add_library(${target} STATIC ${ARGN})
-
-  set(UID1 0x1000007a) # KExecutableImageUidValue, e32uid.h
-  set(UID2 0x100039ce) # KAppUidValue16, apadef.h
-  set(UID3 0x10001234) # target exe UID
-
-  set(target_static_libs
-    ${EPOC_EXTRAS}/lib/armi/urel/SDL3.lib
-    ${EPOC_EXTRAS}/lib/armi/urel/SDL3_mixer.lib)
-
-  set(target_libs
-    ${EPOC_LIB}/NRenderer.lib
-    ${EPOC_LIB}/3dtypes.a
-    ${EPOC_LIB}/cone.lib
-    ${EPOC_PLATFORM}/gcc/lib/gcc-lib/arm-epoc-pe/2.9-psion-98r2/libgcc.a
-    ${EPOC_PLATFORM}/ngagesdk/lib/gcc/arm-epoc-pe/4.6.4/libgcc_ngage.a
-    ${EPOC_LIB}/mediaclientaudiostream.lib
-    ${EPOC_LIB}/charconv.lib
-    ${EPOC_LIB}/bitgdi.lib
-    ${EPOC_LIB}/euser.lib
-    ${EPOC_LIB}/estlib.lib
-    ${EPOC_LIB}/ws32.lib
-    ${EPOC_LIB}/hal.lib
-    ${EPOC_LIB}/fbscli.lib
-    ${EPOC_LIB}/efsrv.lib
-    ${EPOC_LIB}/scdv.lib
-    ${EPOC_LIB}/gdi.lib)
-
-  build_exe_static(${target} exe ${UID1} ${UID2} ${UID3} "${target_static_libs}" "${target_libs}")
-
-  add_dependencies(
-    ${target}.exe
-    ${target})
-endmacro()
-
 function(build_dll source file_ext uid1 uid2 uid3 libs)
   # Create new DefFile from in library
   add_custom_target(
