@@ -24,54 +24,17 @@ endif()
 set(DOWNLOAD_DIR "${SDK_DIR}/cache")
 set(FETCHCONTENT_BASE_DIR "${DOWNLOAD_DIR}" CACHE PATH "FETCHCONTENT_BASE_DIR")
 
-FetchContent_Populate(apps
-    URL https://github.com/mupfdev/mupfdev.github.io/raw/refs/heads/main/ngagesdk/apps.zip
-    URL_HASH SHA1=6e89e554dd502e5b739230ccf2f7c43703867b61
-    DOWNLOAD_DIR "${DOWNLOAD_DIR}"
-    DOWNLOAD_NO_PROGRESS TRUE
-    TLS_VERIFY TRUE
-    SOURCE_DIR "${SDK_DIR}/apps"
-    BUILD_DIR "${CMAKE_CURRENT_LIST_DIR}/apps-build"
-    CONFIGURE_COMMAND "${CMAKE_COMMAND}" -E echo "skipping configure step."
-    BUILD_COMMAND cmake -E echo "Skipping build step."
-    INSTALL_COMMAND cmake -E echo "Skipping install step."
-)
-
 FetchContent_Populate(extras
-    URL https://github.com/mupfdev/mupfdev.github.io/raw/refs/heads/main/ngagesdk/extras.zip
-    URL_HASH SHA1=f5128881b77aaa3fcbe86d602629e51901a3e3b8
-    DOWNLOAD_DIR "${DOWNLOAD_DIR}"
-    DOWNLOAD_NO_PROGRESS TRUE
-    TLS_VERIFY TRUE
-    SOURCE_DIR "${SDK_DIR}/extras"
-    BUILD_DIR "${CMAKE_CURRENT_LIST_DIR}/extras-build"
-    CONFIGURE_COMMAND "${CMAKE_COMMAND}" -E echo "skipping configure step."
-    BUILD_COMMAND cmake -E echo "Skipping build step."
-    INSTALL_COMMAND cmake -E echo "Skipping install step."
-)
+  GIT_REPOSITORY https://github.com/ngagesdk/extras.git
+  GIT_TAG main
+  SOURCE_DIR ${SDK_DIR}/extras)
 
 FetchContent_Populate(sdk
-    URL https://github.com/mupfdev/mupfdev.github.io/raw/refs/heads/main/ngagesdk/sdk.zip
-    URL_HASH SHA1=556b8225ab781e507bf7acd5c9de271918972b28
-    DOWNLOAD_DIR "${DOWNLOAD_DIR}"
-    DOWNLOAD_NO_PROGRESS TRUE
-    TLS_VERIFY TRUE
-    SOURCE_DIR "${SDK_DIR}/sdk"
-    BUILD_DIR "${CMAKE_CURRENT_LIST_DIR}/sdk-build"
-    CONFIGURE_COMMAND "${CMAKE_COMMAND}" -E echo "skipping configure step."
-    BUILD_COMMAND cmake -E echo "Skipping build step."
-    INSTALL_COMMAND cmake -E echo "Skipping install step."
-)
+  GIT_REPOSITORY https://github.com/ngagesdk/sdk.git
+  GIT_TAG main
+  SOURCE_DIR ${SDK_DIR}/sdk)
 
 FetchContent_Populate(tools
-    URL https://github.com/mupfdev/mupfdev.github.io/raw/refs/heads/main/ngagesdk/tools.zip
-    URL_HASH SHA1=a8e1ef7fb9dee6860b616c4348dc13838d6da3e6
-    DOWNLOAD_DIR "${DOWNLOAD_DIR}"
-    DOWNLOAD_NO_PROGRESS TRUE
-    TLS_VERIFY TRUE
-    SOURCE_DIR "${SDK_DIR}/tools"
-    BUILD_DIR "${CMAKE_CURRENT_LIST_DIR}/tools-build"
-    CONFIGURE_COMMAND "${CMAKE_COMMAND}" -E echo "skipping configure step."
-    BUILD_COMMAND cmake -E echo "Skipping build step."
-    INSTALL_COMMAND cmake -E echo "Skipping install step."
-)
+  GIT_REPOSITORY https://github.com/ngagesdk/tools.git
+  GIT_TAG main
+  SOURCE_DIR ${SDK_DIR}/tools)
