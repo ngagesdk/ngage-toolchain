@@ -49,7 +49,7 @@ set(CMAKE_RANLIB "${EPOC_PLATFORM}/gcc/bin/ranlib.exe")
 set(CMAKE_AR "${EPOC_PLATFORM}/gcc/bin/ar.exe")
 
 set(NGAGE_CPPFLAGS "-DFUNCTION_NAME=__FUNCTION__ -D__NGAGE__=1 -D__SYMBIAN32__ -D__GCC32__ -D__EPOC32__ -D__MARM__ -D__MARM_ARMI__ -D_UNICODE")
-set(NGAGE_CPPFLAGS "${NGAGE_CPPFLAGS} -isystem ${EPOC_PLATFORM}/include -isystem ${EPOC_EXTRAS}/include -isystem ${S60_SDK_ROOT}/Series60/Epoc32/Include -isystem ${S60_SDK_ROOT}/Series60/Epoc32/Include/libc -isystem ${S60_SDK_ROOT}/Shared/EPOC32/ngagesdk/include")
+set(NGAGE_CPPFLAGS "${NGAGE_CPPFLAGS} -I ${EPOC_PLATFORM}/include -I ${EPOC_EXTRAS}/include -I ${S60_SDK_ROOT}/Series60/Epoc32/Include -I ${S60_SDK_ROOT}/Series60/Epoc32/Include/libc -I ${S60_SDK_ROOT}/Shared/EPOC32/ngagesdk/include")
 set(NGAGE_CPPFLAGS "${NGAGE_CPPFLAGS} -s -fomit-frame-pointer -O2 -mthumb-interwork -pipe -nostdinc -mstructure-size-boundary=8")
 
 set(NGAGE_CFLAGS "${NGAGE_CPPFLAGS} -fno-leading-underscore")
@@ -62,6 +62,10 @@ set(CMAKE_EXE_LINKER_FLAGS_INIT "")#-Wl,-e,_E32Startup -Wl,-u,_E32Startup")
 
 set(CMAKE_C_STANDARD_LIBRARIES "${EPOC_LIB}/eexe.lib")
 set(CMAKE_CXX_STANDARD_LIBRARIES "${EPOC_LIB}/eexe.lib")
+
+set(CMAKE_CXX_COMPILER_ID_RUN TRUE)
+set(CMAKE_CXX_COMPILER_FORCED TRUE)
+set(CMAKE_CXX_COMPILER_WORKS TRUE)
 
 # build_exe_static is performed by ngagecc.py
 
