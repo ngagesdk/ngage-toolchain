@@ -79,6 +79,7 @@ diagnostics.add_warning('absolute-paths', enabled=False, part_of_all=False)
 # diagnostics.add_warning('legacy-settings', enabled=False, part_of_all=False)
 # # Catch-all for other emcc warnings
 diagnostics.add_warning('uid')
+diagnostics.add_warning('linkflags')
 # diagnostics.add_warning('emcc')
 # diagnostics.add_warning('undefined', error=True)
 diagnostics.add_warning('deprecated', shared=True)
