@@ -2,11 +2,16 @@ cmake_minimum_required(VERSION 3.10)
 
 project(celeste C)
 
+find_package(SDL3 REQUIRED)
+find_package(SDL3_mixer REQUIRED)
+
 add_executable(celeste
   src/main.c
   src/celeste.c
   src/celeste_SDL3.c
 )
+target_link_libraries(celeste PRIVATE SDL3_mixer::SDL3_mixer)
+target_link_libraries(celeste PRIVATE SDL3::SDL3)
 
 set_property(TARGET celeste PROPERTY C_STANDARD 99)
 
@@ -14,25 +19,4 @@ if(NGAGESDK)
   target_link_options(celeste PRIVATE "SHELL:-s UID1=0x1000007a") # KExecutableImageUidValue, e32uid.h
   target_link_options(celeste PRIVATE "SHELL:-s UID2=0x100039ce") # KAppUidValue16, apadef.h
   target_link_options(celeste PRIVATE "SHELL:-s UID3=0x1000c37e") # celeste.exe UID
-
-  target_link_libraries(celeste PRIVATE
-    ${EPOC_EXTRAS}/lib/armi/urel/SDL3_mixer.lib
-    ${EPOC_EXTRAS}/lib/armi/urel/SDL3.lib
-    ${EPOC_LIB}/NRenderer.lib
-    ${EPOC_LIB}/3dtypes.a
-    ${EPOC_LIB}/cone.lib
-    ${EPOC_PLATFORM}/gcc/lib/gcc-lib/arm-epoc-pe/2.9-psion-98r2/libgcc.a
-    ${EPOC_PLATFORM}/ngagesdk/lib/gcc/arm-epoc-pe/4.6.4/libgcc_ngage.a
-    ${EPOC_LIB}/mediaclientaudiostream.lib
-    ${EPOC_LIB}/charconv.lib
-    ${EPOC_LIB}/bitgdi.lib
-    ${EPOC_LIB}/euser.lib
-    ${EPOC_LIB}/estlib.lib
-    ${EPOC_LIB}/ws32.lib
-    ${EPOC_LIB}/hal.lib
-    ${EPOC_LIB}/fbscli.lib
-    ${EPOC_LIB}/efsrv.lib
-    ${EPOC_LIB}/scdv.lib
-    ${EPOC_LIB}/gdi.lib
-  )
 endif()
