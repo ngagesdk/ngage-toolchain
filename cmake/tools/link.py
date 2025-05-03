@@ -1162,7 +1162,7 @@ def phase_calculate_linker_inputs(options, state, linker_inputs):
     if "-nostlib" not in linker_args:
         linker_args = [
              "-e", "_E32Startup", "-u", "_E32Startup",
-            os.path.join(os.environ["NGAGESDK"], "sdk", "ngagesdk_entry.o"),
+            #os.path.join(os.environ["NGAGESDK"], "sdk", "ngagesdk_entry.o"),
         ] + linker_args
 
     return linker_args
