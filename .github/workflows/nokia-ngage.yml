@@ -43,7 +43,7 @@ jobs:
       shell: pwsh
 
     - name: Fetch SDK
-      run: cmake -G "Ninja" -S ${{ env.NGAGESDK }}/setup -B ${{ env.NGAGESDK }}/build
+      run: cmake -G "Ninja" -P ${{ env.NGAGESDK }}/setup/setup.cmake -S ${{ env.NGAGESDK }}/setup -B ${{ env.NGAGESDK }}/build
       shell: pwsh
 
     - name: Build minimal
@@ -63,9 +63,3 @@ jobs:
         cmake -G "Ninja" -S ${{ env.NGAGESDK }}/projects/celeste -B ${{ env.NGAGESDK }}/projects/celeste/build -DBUILD_CI_WORKFLOW=ON -DCMAKE_TOOLCHAIN_FILE=${{ env.NGAGESDK }}/cmake/ngage-toolchain.cmake
         cmake --build ${{ env.NGAGESDK }}/projects/celeste/build
       shell: pwsh
-
-    - name: Build Simple DirectMedia Layer 3
-      run: |
-        git clone -b nokia_ngage https://github.com/ngagesdk/SDL.git
-        cmake -G "Ninja" -S SDL -B SDL/build -DBUILD_FOR_NOKIA_NGAGE=ON -DCMAKE_TOOLCHAIN_FILE=${{ env.NGAGESDK }}/cmake/ngage-toolchain.cmake
-        cmake --build SDL/build
