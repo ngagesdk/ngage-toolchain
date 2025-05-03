@@ -91,38 +91,6 @@ ngagesdk_add_static_imported_library(efsrv "${EPOC_LIB}/efsrv.lib")
 ngagesdk_add_static_imported_library(scdv "${EPOC_LIB}/scdv.lib")
 ngagesdk_add_static_imported_library(gdi "${EPOC_LIB}/gdi.lib")
 
-# build_exe_static is performed by ngagecc.py
-
-# function(build_exe_static TARGET EXTENSION UID1 UID2 UID3 STATIC_LIBS LIBS)
-#   add_custom_target(${TARGET}.bas ALL
-#     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/lib${TARGET}.a
-#     COMMAND ${EPOC_PLATFORM}/gcc/bin/ld -s -e _E32Startup -u _E32Startup --base-file ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.bas -o ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}_tmp.${EXTENSION} ${EPOC_LIB}/eexe.lib --whole-archive ${CMAKE_CURRENT_BINARY_DIR}/lib${TARGET}.a ${STATIC_LIBS} --no-whole-archive ${LIBS}
-#   )
-#
-#   add_custom_target(${TARGET}.exp ALL
-#     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.bas
-#     COMMAND ${EPOC_PLATFORM}/gcc/bin/dlltool -m arm_interwork --base-file ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.bas --output-exp ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.exp
-#   )
-#
-#   add_custom_target(${TARGET}.${EXTENSION}_Intermediate ALL
-#     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.exp
-#     COMMAND ${EPOC_PLATFORM}/gcc/bin/ld -s -e _E32Startup -u _E32Startup ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.exp -Map ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.map -o ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.${EXTENSION}_Intermediate ${EPOC_LIB}/eexe.lib --whole-archive ${CMAKE_CURRENT_BINARY_DIR}/lib${TARGET}.a ${STATIC_LIBS} --no-whole-archive ${LIBS}
-#   )
-#
-#   add_custom_target(${TARGET}.${EXTENSION} ALL
-#     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.${EXTENSION}_Intermediate
-#     COMMAND ${EPOC_PLATFORM}/Tools/petran
-#         ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.${EXTENSION}_Intermediate
-#         ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.${EXTENSION} -nocall -uid1 ${UID1} -uid2 ${UID2} -uid3 ${UID3} -stack 500000 -heap 1000000 20000000
-#   )
-# endfunction()
-
-
-# build_exe is performed by ngagecc.py
-#function(build_exe TARGET EXTENSION UID1 UID2 UID3 LIBS)
-#    build_exe_static(${TARGET} exe ${UID1} ${UID2} ${UID3} "" "${LIBS}")
-#endfunction()
-
 cmake_policy(SET CMP0053 NEW)  # Ensures proper argument parsing.
 
 # FIXME: build_dll is not implemented by ngagecc.py
