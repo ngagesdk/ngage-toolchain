@@ -39,7 +39,7 @@ from .utils import read_file, write_file, delete_file
 from .utils import removeprefix, exit_with_error
 from .shared import in_temp, safe_copy, do_replace, OFormat
 from .shared import DEBUG, WINDOWS
-from .shared import DYLIB_EXTENSIONS
+from .shared import epoc_lib, epoc_platform, s60_sdk_root
 from .shared import unsuffixed, unsuffixed_basename, get_file_suffix
 from .settings import settings, default_setting, user_settings, JS_ONLY_SETTINGS, DEPRECATED_SETTINGS
 # from .minimal_runtime_shell import generate_minimal_runtime_html
@@ -530,7 +530,7 @@ def phase_linker_setup(options, state) -> LinkArtifactNames:
         default_setting('ERROR_ON_UNDEFINED_SYMBOLS', 0)
 
     if options.oformat == OFormat.EXE:
-        if settings.FIXME_DLLTOOL_LD_PETRAN:
+        if settings.DLLTOOL_LD_PETRAN:
             # FIXME: store intermediates in emscripten_temp directory (as we do for intermediate compiled objects)
             targetdir = os.path.dirname(target)
             target_basename, target_ext = os.path.splitext(os.path.basename(target))
@@ -619,7 +619,7 @@ def filter_link_arguments_for_multilink(link_args: list[str]) -> list[str]:
 def phase_link(linker_arguments, targets: LinkArtifactNames):
     logger.debug(f'linking: {linker_arguments}')
 
-    if settings.FIXME_DLLTOOL_LD_PETRAN:
+    if settings.DLLTOOL_LD_PETRAN:
         # Step 1
         filtered_link_args = filter_link_arguments_for_multilink(linker_arguments)
         step1_ld_args = filtered_link_args + ["--base-file", targets.step1_ld_base]
@@ -1157,12 +1157,22 @@ def phase_calculate_linker_inputs(options, state, linker_inputs):
     # Interleave the linker inputs with the linker flags while maintainging their
     # relative order on the command line (both of these list are pairs, with the
     # first element being their command line position).
-    linker_args = [val for _, val in sorted(linker_inputs + state.link_flags)]
+    linker_args = []
+    if settings.NGAGESDK_LIBDIRS:
+        linker_args += [
+            f"-L{s60_sdk_root()}",
+            f"-L{epoc_platform()}",
+            f"-L{epoc_lib()}",
+        ]
+    if settings.ENTRY:
+        linker_args += ["-e", settings.ENTRY, "-u", settings.ENTRY]
+    linker_args += [val for _, val in sorted(linker_inputs + state.link_flags)]
 
-    if "-nostlib" not in linker_args:
+    if "-nostlib" not in linker_args and settings.MAIN_COMPAT:
+        if settings.ENTRY != "_E32Startup":
+            exit_with_error("-s MAIN_COMPAT requires -s ENTRY=_E32Startup")
         linker_args = [
-             "-e", "_E32Startup", "-u", "_E32Startup",
-            #os.path.join(os.environ["NGAGESDK"], "sdk", "ngagesdk_entry.o"),
+            os.path.join(os.environ["NGAGESDK"], "sdk", "ngagesdk_entry.o"),
         ] + linker_args
 
     return linker_args

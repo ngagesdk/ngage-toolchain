@@ -2,6 +2,7 @@
 # Emscripten is available under two separate licenses, the MIT license and the
 # University of Illinois/NCSA Open Source License.  Both these licenses can be
 # found in the LICENSE file.
+import functools
 
 from .toolchain_profiler import ToolchainProfiler
 
@@ -533,17 +534,26 @@ def build_clang_tool_path(tool):
     #     return os.path.join(config.LLVM_ROOT, tool)
     return tool
 
+@functools.cache
+def ngagesdk_root():
+    return os.path.join(os.environ["NGAGESDK"], "sdk")
+
+@functools.cache
+def s60_sdk_root():
+    return os.path.join(ngagesdk_root(), "sdk/6.1")
+
+@functools.cache
+def epoc_platform():
+    return os.path.join(s60_sdk_root(), "Shared/EPOC32")
+
+@functools.cache
+def epoc_lib():
+    return os.path.join(s60_sdk_root(), "Series60/Epoc32/Release/armi/urel")
 
 # Some distributions ship with multiple clang versions so they add
 # the version to the binaries, cope with that
 def build_ngage_tool_path(tool):
     return os.path.join(os.environ["NGAGESDK"], "sdk/sdk/6.1/Shared/EPOC32", tool)
-    # if config.CLANG_ADD_VERSION:
-    #     return os.path.join(config.LLVM_ROOT, tool + "-" + config.CLANG_ADD_VERSION)
-    # else:
-    #     return os.path.join(config.LLVM_ROOT, tool)
-    # return tool
-
 
 def exe_suffix(cmd):
     return cmd + '.exe' if WINDOWS else cmd

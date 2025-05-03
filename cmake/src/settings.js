@@ -65,6 +65,11 @@ var ENTRY = '_E32Startup';
 // [compile]
 var THUMB = false;
 
+// provide startup code, passing control to a user-supplied main
+// requires ENTRY='_E32Startup'
+// [link]
+var MAIN_COMPAT = true;
+
 // Symbols that are explicitly exported. These symbols are kept alive through
 // LLVM dead code elimination, and also made accessible outside of the
 // generated code even after running closure compiler (on "Module").  Native
@@ -81,7 +86,12 @@ var EXPORTED_FUNCTIONS = [];
 // Run dlltool, ld and petran on executable
 // FIXME: rename this option
 // [link]
-var FIXME_DLLTOOL_LD_PETRAN = true;
+var DLLTOOL_LD_PETRAN = true;
+
+// Add NGAGESDK library dirs
+// FIXME: rename this option
+// [link]
+var NGAGESDK_LIBDIRS = true;
 
 // [link]
 var STACK_SIZE = 500000;
@@ -1255,17 +1265,6 @@ var LINKABLE = false;
 // [compile+link]
 //var STRICT = false;
 
-// // Allow program to link with or without ``main`` symbol.
-// // If this is disabled then one must provide a ``main`` symbol or explicitly
-// // opt out by passing ``--no-entry`` or an EXPORTED_FUNCTIONS list that doesn't
-// // include ``_main``.
-// // [link]
-// var IGNORE_MISSING_MAIN = true;
-//
-// // Add ``"use strict;"`` to generated JS
-// // [link]
-// var STRICT_JS = false;
-
 // If set to 1, we will warn on any undefined symbols that are not resolved by
 // the ``library_*.js`` files. Note that it is common in large projects to not
 // implement everything, when you know what is not going to actually be called
@@ -1285,284 +1284,6 @@ var WARN_ON_UNDEFINED_SYMBOLS = true;
 // [link]
 var ERROR_ON_UNDEFINED_SYMBOLS = true;
 
-// // Use small chunk size for binary synchronous XHR's in Web Workers.  Used for
-// // testing.  See test_chunked_synchronous_xhr in runner.py and library.js.
-// // [link]
-// var SMALL_XHR_CHUNKS = false;
-//
-// // If 1, will include shim code that tries to 'fake' a browser environment, in
-// // order to let you run a browser program (say, using SDL) in the shell.
-// // Obviously nothing is rendered, but this can be useful for benchmarking and
-// // debugging if actual rendering is not the issue. Note that the shim code is
-// // very partial - it is hard to fake a whole browser! - so keep your
-// // expectations low for this to work.
-// // [link]
-// var HEADLESS = false;
-//
-// // If 1, we force Date.now(), Math.random, etc. to return deterministic results.
-// // This also tries to make execution deterministic across machines and
-// // environments, for example, not doing anything different based on the
-// // browser's language setting (which would mean you can get different results
-// // in different browsers, or in the browser and in node).
-// // Good for comparing builds for debugging purposes (and nothing else).
-// // [link]
-// var DETERMINISTIC = false;
-//
-// // By default we emit all code in a straightforward way into the output
-// // .js file. That means that if you load that in a script tag in a web
-// // page, it will use the global scope. With ``MODULARIZE`` set, we instead emit
-// // the code wrapped in a function that returns a promise. The promise is
-// // resolved with the module instance when it is safe to run the compiled code,
-// // similar to the ``onRuntimeInitialized`` callback. You do not need to use the
-// // ``onRuntimeInitialized`` callback when using ``MODULARIZE``.
-// //
-// // (If WASM_ASYNC_COMPILATION is off, that is, if compilation is
-// // *synchronous*, then it would not make sense to return a Promise, and instead
-// // the Module object itself is returned, which is ready to be used.)
-// //
-// // The default name of the function is ``Module``, but can be changed using the
-// // ``EXPORT_NAME`` option. We recommend renaming it to a more typical name for a
-// // factory function, e.g. ``createModule``.
-// //
-// // You use the factory function like so::
-// //
-// //   const module = await EXPORT_NAME();
-// //
-// // or::
-// //
-// //   let module;
-// //   EXPORT_NAME().then(instance => {
-// //     module = instance;
-// //   });
-// //
-// //
-// // The factory function accepts 1 parameter, an object with default values for
-// // the module instance::
-// //
-// //   const module = await EXPORT_NAME({ option: value, ... });
-// //
-// // Note the parentheses - we are calling EXPORT_NAME in order to instantiate
-// // the module. This allows you to create multiple instances of the module.
-// //
-// // Note that in MODULARIZE mode we do *not* look for a global ``Module`` object
-// // for default values. Default values must be passed as a parameter to the
-// // factory function.
-// //
-// // The default .html shell file provided in MINIMAL_RUNTIME mode will create
-// // a singleton instance automatically, to run the application on the page.
-// // (Note that it does so without using the Promise API mentioned earlier, and
-// // so code for the Promise is not even emitted in the .js file if you tell
-// // emcc to emit an .html output.)
-// // The default .html shell file provided by traditional runtime mode is only
-// // compatible with MODULARIZE=0 mode, so when building with traditional
-// // runtime, you should provided your own html shell file to perform the
-// // instantiation when building with MODULARIZE=1. (For more details, see
-// // https://github.com/emscripten-core/emscripten/issues/7950)
-// //
-// // If you add --pre-js or --post-js files, they will be included inside
-// // the factory function with the rest of the emitted code in order to be
-// // optimized together with it.
-// //
-// // If you want to include code outside all of the generated code, including the
-// // factory function, you can use --extern-pre-js or --extern-post-js. While
-// // --pre-js and --post-js happen to do that in non-MODULARIZE mode, their
-// // intended usage is to add code that is optimized with the rest of the emitted
-// // code, allowing better dead code elimination and minification.
-// //
-// // Experimental Feature - Instance ES Modules:
-// //
-// // Note this feature is still under active development and is subject to change!
-// //
-// // To enable this feature use -sMODULARIZE=instance. Enabling this mode will
-// // produce an ES module that is a singleton with ES module exports. The
-// // module will export a default value that is an async init function and will
-// // also export named values that correspond to the Wasm exports and runtime
-// // exports. The init function must be called before any of the exports can be
-// // used. An example of using the module is below.
-// //
-// //   import init, { foo, bar } from "./my_module.mjs"
-// //   await init(optionalArguments);
-// //   foo();
-// //   bar();
-// //
-// // [link]
-// var MODULARIZE = false;
-//
-// // Export using an ES6 Module export rather than a UMD export.  MODULARIZE must
-// // be enabled for ES6 exports and is implicitly enabled if not already set.
-// //
-// // This is implicitly enabled if the output suffix is set to 'mjs'.
-// //
-// // [link]
-// var EXPORT_ES6 = false;
-//
-// // Use the ES6 Module relative import feature 'import.meta.url'
-// // to auto-detect WASM Module path.
-// // It might not be supported on old browsers / toolchains. This setting
-// // may not be disabled when Node.js is targeted (-sENVIRONMENT=*node*).
-// // [link]
-// var USE_ES6_IMPORT_META = true;
-//
-// // Global variable to export the module as for environments without a
-// // standardized module loading system (e.g. the browser and SM shell).
-// // [link]
-// var EXPORT_NAME = 'Module';
-//
-// // When set to 0, we do not emit eval() and new Function(), which disables some
-// // functionality (causing runtime errors if attempted to be used), but allows
-// // the emitted code to be acceptable in places that disallow dynamic code
-// // execution (chrome packaged app, privileged firefox app, etc.). Pass this flag
-// // when developing an Emscripten application that is targeting a privileged or a
-// // certified execution environment, see Firefox Content Security Policy (CSP)
-// // webpage for details:
-// // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/script-src
-// // in particular the 'unsafe-eval' and 'wasm-unsafe-eval' policies.
-// //
-// // When this flag is set, the following features (linker flags) are unavailable:
-// //
-// //  - RELOCATABLE: the function loadDynamicLibrary would need to eval().
-// //
-// // and some features may fall back to slower code paths when they need to:
-// // Embind: uses eval() to jit functions for speed.
-// //
-// // Additionally, the following Emscripten runtime functions are unavailable when
-// // DYNAMIC_EXECUTION=0 is set, and an attempt to call them will throw an exception:
-// //
-// // - emscripten_run_script(),
-// // - emscripten_run_script_int(),
-// // - emscripten_run_script_string(),
-// // - dlopen(),
-// // - the functions ccall() and cwrap() are still available, but they are
-// //   restricted to only being able to call functions that have been exported in
-// //   the Module object in advance.
-// //
-// // When -sDYNAMIC_EXECUTION=2 is set, attempts to call to eval() are demoted to
-// // warnings instead of throwing an exception.
-// // [link]
-// var DYNAMIC_EXECUTION = 1;
-//
-// // whether we are in the generate struct_info bootstrap phase
-// // [link]
-// var BOOTSTRAPPING_STRUCT_INFO = false;
-//
-// // Add some calls to emscripten tracing APIs
-// // [compile+link]
-// var EMSCRIPTEN_TRACING = false;
-//
-// // Specify the GLFW version that is being linked against.  Only relevant, if you
-// // are linking against the GLFW library.  Valid options are 2 for GLFW2 and 3
-// // for GLFW3.
-// // [link]
-// var USE_GLFW = 0;
-//
-// // Whether to use compile code to WebAssembly. Set this to 0 to compile to JS
-// // instead of wasm.
-// //
-// // Specify -sWASM=2 to target both WebAssembly and JavaScript at the same time.
-// // In that build mode, two files a.wasm and a.wasm.js are produced, and at runtime
-// // the WebAssembly file is loaded if browser/shell supports it. Otherwise the
-// // .wasm.js fallback will be used.
-// //
-// // If WASM=2 is enabled and the browser fails to compile the WebAssembly module,
-// // the page will be reloaded in Wasm2JS mode.
-// // [link]
-// var WASM = 1;
-//
-// // STANDALONE_WASM indicates that we want to emit a wasm file that can run
-// // without JavaScript. The file will use standard APIs such as wasi as much as
-// // possible to achieve that.
-// //
-// // This option does not guarantee that the wasm can be used by itself - if you
-// // use APIs with no non-JS alternative, we will still use those (e.g., OpenGL
-// // at the time of writing this). This gives you the option to see which APIs
-// // are missing, and if you are compiling for a custom wasi embedding, to add
-// // those to your embedding.
-// //
-// // We may still emit JS with this flag, but the JS should only be a convenient
-// // way to run the wasm on the Web or in Node.js, and you can run the wasm by
-// // itself without that JS (again, unless you use APIs for which there is no
-// // non-JS alternative) in a wasm runtime like wasmer or wasmtime.
-// //
-// // Note that even without this option we try to use wasi etc. syscalls as much
-// // as possible. What this option changes is that we do so even when it means
-// // a tradeoff with JS size. For example, when this option is set we do not
-// // import the Memory - importing it is useful for JS, so that JS can start to
-// // use it before the wasm is even loaded, but in wasi and other wasm-only
-// // environments the expectation is to create the memory in the wasm itself.
-// // Doing so prevents some possible JS optimizations, so we only do it behind
-// // this flag.
-// //
-// // When this flag is set we do not legalize the JS interface, since the wasm is
-// // meant to run in a wasm VM, which can handle i64s directly. If we legalized it
-// // the wasm VM would not recognize the API. However, this means that the
-// // optional JS emitted won't run if you use a JS API with an i64. You can use
-// // the WASM_BIGINT option to avoid that problem by using BigInts for i64s which
-// // means we don't need to legalize for JS (but this requires a new enough JS
-// // VM).
-// //
-// // Standalone builds require a ``main`` entry point by default.  If you want to
-// // build a library (also known as a reactor) instead you can pass ``--no-entry``.
-// // [link]
-// var STANDALONE_WASM = false;
-//
-// // Whether to ignore implicit traps when optimizing in binaryen.  Implicit
-// // traps are the traps that happen in a load that is out of bounds, or
-// // div/rem of 0, etc. With this option set, the optimizer assumes that loads
-// // cannot trap, and therefore that they have no side effects at all. This
-// // is *not* safe in general, as you may have a load behind a condition which
-// // ensures it it is safe; but if the load is assumed to not have side effects it
-// // could be executed unconditionally. For that reason this option is generally
-// // not useful on large and complex projects, but in a small and simple enough
-// // codebase it may help reduce code size a little bit.
-// // [link]
-// var BINARYEN_IGNORE_IMPLICIT_TRAPS = false;
-//
-// // A comma-separated list of extra passes to run in the binaryen optimizer,
-// // Setting this does not override/replace the default passes. It is appended at
-// // the end of the list of passes.
-// // [link]
-// var BINARYEN_EXTRA_PASSES = "";
-//
-// // Whether to compile the wasm asynchronously, which is more efficient and does
-// // not block the main thread. This is currently required for all but the
-// // smallest modules to run in chrome.
-// //
-// // (This option was formerly called BINARYEN_ASYNC_COMPILATION)
-// // [link]
-// var WASM_ASYNC_COMPILATION = true;
-//
-// // If set to 1, the dynCall() and dynCall_sig() API is made available
-// // to caller.
-// // [link]
-// var DYNCALLS = false;
-//
-// // WebAssembly integration with JavaScript BigInt. When enabled we don't need to
-// // legalize i64s into pairs of i32s, as the wasm VM will use a BigInt where an
-// // i64 is used.
-// // [link]
-// var WASM_BIGINT = true;
-//
-// // WebAssembly defines a "producers section" which compilers and tools can
-// // annotate themselves in, and LLVM emits this by default.
-// // Emscripten will strip that out so that it is *not* emitted because it
-// // increases code size, and also some users may not want information
-// // about their tools to be included in their builds for privacy or security
-// // reasons, see
-// // https://github.com/WebAssembly/tool-conventions/issues/93.
-// // [link]
-// var EMIT_PRODUCERS_SECTION = false;
-//
-// // Emits emscripten license info in the JS output.
-// // [link]
-// var EMIT_EMSCRIPTEN_LICENSE = false;
-//
-// // Whether to legalize the JS FFI interfaces (imports/exports) by wrapping them
-// // to automatically demote i64 to i32 and promote f32 to f64. This is necessary
-// // in order to interface with JavaScript.  For non-web/non-JS embeddings, setting
-// // this to 0 may be desirable.
-// // [link]
-// // [deprecated]
-// var LEGALIZE_JS_FFI = true;
 //
 // // Ports
 //
