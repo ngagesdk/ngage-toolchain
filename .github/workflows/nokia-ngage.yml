@@ -48,18 +48,18 @@ jobs:
 
     - name: Build minimal
       run: |
-        cmake -G "Ninja" -S ${{ env.NGAGESDK }}/projects/minimal -B ${{ env.NGAGESDK }}/projects/minimal/build -DCMAKE_TOOLCHAIN_FILE=${{ env.NGAGESDK }}/cmake/ngage-toolchain.cmake
+        cmake -DCMAKE_PREFIX_PATH=${env.NGAGESDK}/sdk/extras/lib/cmake -G "Ninja" -S ${{ env.NGAGESDK }}/projects/minimal -B ${{ env.NGAGESDK }}/projects/minimal/build -DCMAKE_TOOLCHAIN_FILE=${{ env.NGAGESDK }}/cmake/ngage-toolchain.cmake
         cmake --build ${{ env.NGAGESDK }}/projects/minimal/build
       shell: pwsh
 
     - name: Build template
       run: |
-        cmake -G "Ninja" -S ${{ env.NGAGESDK }}/projects/template -B ${{ env.NGAGESDK }}/projects/template/build -DBUILD_CI_WORKFLOW=ON -DCMAKE_TOOLCHAIN_FILE=${{ env.NGAGESDK }}/cmake/ngage-toolchain.cmake
+        cmake -DCMAKE_PREFIX_PATH=${env.NGAGESDK}/sdk/extras/lib/cmake -G "Ninja" -S ${{ env.NGAGESDK }}/projects/template -B ${{ env.NGAGESDK }}/projects/template/build -DBUILD_CI_WORKFLOW=ON -DCMAKE_TOOLCHAIN_FILE=${{ env.NGAGESDK }}/cmake/ngage-toolchain.cmake
         cmake --build ${{ env.NGAGESDK }}/projects/template/build
       shell: pwsh
 
     - name: Build Celeste
       run: |
-        cmake -G "Ninja" -S ${{ env.NGAGESDK }}/projects/celeste -B ${{ env.NGAGESDK }}/projects/celeste/build -DBUILD_CI_WORKFLOW=ON -DCMAKE_TOOLCHAIN_FILE=${{ env.NGAGESDK }}/cmake/ngage-toolchain.cmake
+        cmake -DCMAKE_PREFIX_PATH=${env.NGAGESDK}/sdk/extras/lib/cmake -G "Ninja" -S ${{ env.NGAGESDK }}/projects/celeste -B ${{ env.NGAGESDK }}/projects/celeste/build -DBUILD_CI_WORKFLOW=ON -DCMAKE_TOOLCHAIN_FILE=${{ env.NGAGESDK }}/cmake/ngage-toolchain.cmake
         cmake --build ${{ env.NGAGESDK }}/projects/celeste/build
       shell: pwsh
