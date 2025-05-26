@@ -12,8 +12,8 @@
 
 #include <stdio.h>
 #include <time.h>
-#include "SDL3/SDL.h"
-#include "SDL3_mixer/SDL_mixer.h"
+#include <SDL3/SDL.h>
+#include <SDL3_mixer/SDL_mixer.h>
 #include "celeste_SDL3.h"
 #include "celeste.h"
 #include "tilemap.h"
@@ -58,7 +58,7 @@ static Uint32 map[16];
 
 static Uint16 buttons_state = 0;
 static _Bool enable_screenshake = 1;
-static _Bool paused= 0;
+static _Bool paused = 0;
 static void* initial_game_state = NULL;
 static void* game_state = NULL;
 static Mix_Music* current_music = NULL;
@@ -123,7 +123,7 @@ int Init()
     ResetPalette();
     SDL_HideCursor();
 
-    SDL_Log("game state size %gkb", Celeste_P8_get_state_size()/1024.);
+    SDL_Log("game state size %gkb", Celeste_P8_get_state_size() / 1024.);
     SDL_Log("now loading...");
 
     LoadData();
@@ -305,7 +305,7 @@ int Iterate()
 {
     int numkeys;
     const bool* kbstate = SDL_GetKeyboardState(&numkeys);
-    static int reset_input_timer  = 0;
+    static int reset_input_timer = 0;
 
     // Hold C (backspace) to reset.
     if (initial_game_state != NULL && kbstate[SDL_SCANCODE_BACKSPACE])
@@ -313,7 +313,7 @@ int Iterate()
         reset_input_timer++;
         if (reset_input_timer >= 30)
         {
-            reset_input_timer=0;
+            reset_input_timer = 0;
             OSDset("reset");
             paused = 0;
             Celeste_P8_load_state(initial_game_state);
@@ -341,11 +341,11 @@ int Iterate()
 
     if (paused)
     {
-        const int x0 = PICO8_W/2-3*4, y0 = 8;
+        const int x0 = PICO8_W / 2 - 3 * 4, y0 = 8;
 
-        p8_rectfill(x0-1,y0-1, 6*4+x0+1,6+y0+1, 6);
-        p8_rectfill(x0,y0, 6*4+x0,6+y0, 0);
-        p8_print("paused", x0+1, y0+1, 7);
+        p8_rectfill(x0 - 1, y0 - 1, 6 * 4 + x0 + 1, 6 + y0 + 1, 6);
+        p8_rectfill(x0, y0, 6 * 4 + x0, 6 + y0, 0);
+        p8_print("paused", x0 + 1, y0 + 1, 7);
     }
     else
     {
@@ -386,7 +386,7 @@ void Destroy()
         SDL_DestroyTexture(SDL_screen);
     }
 
-    for (int i = 0; i < (sizeof(snd))/(sizeof(*snd)); i++)
+    for (int i = 0; i < (sizeof(snd)) / (sizeof(*snd)); i++)
     {
         if (snd[i])
         {
@@ -394,7 +394,7 @@ void Destroy()
         }
     }
 #if ENABLE_MUSIC
-    for (int i = 0; i < (sizeof(mus))/(sizeof(*mus)); i++)
+    for (int i = 0; i < (sizeof(mus)) / (sizeof(*mus)); i++)
     {
         if (mus[i])
         {
@@ -410,7 +410,7 @@ void Destroy()
 static void Flip()
 {
     SDL_FRect source = { 0.f, 0.f, 128.f, 128.f };
-    SDL_FRect dest   = { 24.f, 25.f, 128.f, 128.f };
+    SDL_FRect dest = { 24.f, 25.f, 128.f, 128.f };
 
     SDL_UpdateTexture(SDL_screen, NULL, screen->pixels, screen->pitch);
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -512,9 +512,9 @@ static void OSDdraw(void)
     if (osd_timer > 0)
     {
         const int x = 4;
-        const int y = 120 + (osd_timer < 10 ? 10-osd_timer : 0); // Disappear by going below the screen.
-        p8_rectfill(x-2, y-2, x+4*(int)SDL_strlen(osd_text), y+6, 6); // Outline.
-        p8_rectfill(x-1, y-1, x+4*(int)SDL_strlen(osd_text)-1, y+5, 0);
+        const int y = 120 + (osd_timer < 10 ? 10 - osd_timer : 0); // Disappear by going below the screen.
+        p8_rectfill(x - 2, y - 2, x + 4 * (int)SDL_strlen(osd_text), y + 6, 6); // Outline.
+        p8_rectfill(x - 1, y - 1, x + 4 * (int)SDL_strlen(osd_text) - 1, y + 5, 0);
         p8_print(osd_text, x, y, 7);
     }
 }

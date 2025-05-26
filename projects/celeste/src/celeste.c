@@ -18,7 +18,7 @@
   * so _init becomes Celeste_P8_init && music becomes P8music, etc
   */
 
-#include "SDL3/SDL.h"
+#include <SDL3/SDL.h>
 #include "celeste.h"
 
   // I cant be bothered to put all function declarations in an appropiate place so ill just toss them all here:

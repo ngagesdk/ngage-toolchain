@@ -8,9 +8,9 @@
 #define NGAGE_W 176
 #define NGAGE_H 208
 
-#include "SDL3/SDL.h"
-#include "SDL3/SDL_main.h"
-#include "SDL3_mixer/SDL_mixer.h"
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_main.h>
+#include <SDL3_mixer/SDL_mixer.h>
 
 SDL_Window* window;
 SDL_Renderer* renderer;
@@ -28,7 +28,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
         return SDL_APP_FAILURE;
     }
 
-    if (!SDL_CreateWindowAndRenderer("Celeste", NGAGE_W, NGAGE_H, 0, &window, &renderer))
+    if (!SDL_CreateWindowAndRenderer("template", NGAGE_W, NGAGE_H, 0, &window, &renderer))
     {
         SDL_Log("Couldn't create window/renderer: %s", SDL_GetError());
         return SDL_APP_FAILURE;
