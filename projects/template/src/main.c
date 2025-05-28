@@ -10,10 +10,10 @@
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
-#include <SDL3_mixer/SDL_mixer.h>
 
 SDL_Window* window;
 SDL_Renderer* renderer;
+static SDL_AudioDeviceID audio_device;
 
 // This function runs once at startup.
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
@@ -43,9 +43,10 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
     spec.format = SDL_AUDIO_S16;
     spec.freq = 8000;
 
-    if (!Mix_OpenAudio(0, &spec))
-    {
-        SDL_Log("Mix_Init: %s", SDL_GetError());
+    audio_device = SDL_OpenAudioDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec);
+    if (audio_device == 0) {
+        SDL_Log("SDL_OpenAudioDevice: %s", SDL_GetError());
+        return SDL_APP_FAILURE;
     }
 
     SDL_RenderClear(renderer);
@@ -97,7 +98,6 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 // This function runs once at shutdown.
 void SDL_AppQuit(void* appstate, SDL_AppResult result)
 {
-    Mix_CloseAudio();
-    Mix_Quit();
+    SDL_CloseAudioDevice(audio_device);
     // SDL will clean up the window/renderer for us.
 }

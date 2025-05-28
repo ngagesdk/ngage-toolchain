@@ -3,12 +3,10 @@ cmake_minimum_required(VERSION 3.10)
 project(template C)
 
 find_package(SDL3 REQUIRED)
-find_package(SDL3_mixer REQUIRED)
 
 add_executable(template
   src/main.c
 )
-target_link_libraries(template PRIVATE SDL3_mixer::SDL3_mixer)
 target_link_libraries(template PRIVATE SDL3::SDL3)
 
 set_property(TARGET template PROPERTY C_STANDARD 99)
