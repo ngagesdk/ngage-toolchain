@@ -94,7 +94,7 @@ int Init()
 {
     int pico8emu(CELESTE_P8_CALLBACK_TYPE call, ...);
 
-    SDL_PixelFormat format = SDL_PIXELFORMAT_ARGB4444;
+    SDL_PixelFormat format = SDL_PIXELFORMAT_XRGB4444;
 
     SDL_screen = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_STREAMING, PICO8_W, PICO8_H);
     if (!SDL_screen)
@@ -811,7 +811,7 @@ static Uint32 getpixel(SDL_Surface* surface, int x, int y)
         Uint8 g6 = (pixel >> 5) & 0x3F;  // 6 bits for green.
         Uint8 b5 = pixel & 0x1F;         // 5 bits for blue.
 
-        // Scale to 4 bits for ARGB4444.
+        // Scale to 4 bits for XRGB4444.
         Uint8 r4 = (r5 * 15) / 31;
         Uint8 g4 = (g6 * 15) / 63;
         Uint8 b4 = (b5 * 15) / 31;
