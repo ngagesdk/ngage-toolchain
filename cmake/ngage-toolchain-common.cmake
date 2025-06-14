@@ -101,57 +101,57 @@ cmake_policy(SET CMP0053 NEW)  # Ensures proper argument parsing.
 
 # FIXME: build_dll is not implemented by ngagecc.py
 
-function(build_dll TARGET EXTENSION UID1 UID2 UID3 LIBS)
+function(build_dll LIB FILENAME EXTENSION UID1 UID2 UID3 LIBS)
   # Create new DefFile from in library
-  add_custom_target(${TARGET}.def ALL
-    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/lib${TARGET}.a
-    COMMAND ${EPOC_PLATFORM}/gcc/bin/dlltool -m arm_interwork --output-def ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.def ${CMAKE_CURRENT_BINARY_DIR}/lib${TARGET}.a
+  add_custom_target(${FILENAME}.def ALL
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${LIB}.lib
+    COMMAND ${EPOC_PLATFORM}/gcc/bin/dlltool -m arm_interwork --output-def ${CMAKE_CURRENT_BINARY_DIR}/${FILENAME}.def ${CMAKE_CURRENT_BINARY_DIR}/${LIB}.lib
   )
 
-  build_dll_ex("${TARGET}" "${EXTENSION}" "${UID1}" "${UID2}" "${UID3}" "${LIBS}" "${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.def")
+  build_dll_ex("${LIB}" "${FILENAME}" "${EXTENSION}" "${UID1}" "${UID2}" "${UID3}" "${LIBS}" "${CMAKE_CURRENT_BINARY_DIR}/${FILENAME}.def")
 endfunction()
 
-function(build_dll_ex TARGET EXTENSION UID1 UID2 UID3 LIBS def_file)
+function(build_dll_ex LIB FILENAME EXTENSION UID1 UID2 UID3 LIBS def_file)
   # Create new Export file from generated DefFle
-  add_custom_target(${TARGET}_tmp.exp ALL
-    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.def
+  add_custom_target(${FILENAME}_tmp.exp ALL
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${FILENAME}.def
     COMMAND ${EPOC_PLATFORM}/gcc/bin/dlltool -m arm_interwork --def ${def_file}
-      --output-exp ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}_tmp.exp --dllname ${TARGET}[${UID3}].${EXTENSION}
+      --output-exp ${CMAKE_CURRENT_BINARY_DIR}/${FILENAME}_tmp.exp --dllname ${FILENAME}[${UID3}].${EXTENSION}
   )
 
   # Create new Base file
-  add_custom_target(${TARGET}.bas ALL
-    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}_tmp.exp
-    COMMAND ${EPOC_PLATFORM}/gcc/bin/ld -s -e _E32Dll -u _E32Dll ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}_tmp.exp --dll
-        --base-file ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.bas -o ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}_tmp.${EXTENSION}
-        ${EPOC_LIB}/edll.lib --whole-archive ${CMAKE_CURRENT_BINARY_DIR}/lib${TARGET}.a --no-whole-archive ${LIBS}
+  add_custom_target(${FILENAME}.bas ALL
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${FILENAME}_tmp.exp
+    COMMAND ${EPOC_PLATFORM}/gcc/bin/ld -s -e _E32Dll -u _E32Dll ${CMAKE_CURRENT_BINARY_DIR}/${FILENAME}_tmp.exp --dll
+        --base-file ${CMAKE_CURRENT_BINARY_DIR}/${FILENAME}.bas -o ${CMAKE_CURRENT_BINARY_DIR}/${FILENAME}_tmp.${EXTENSION}
+        ${EPOC_LIB}/edll.lib --whole-archive ${CMAKE_CURRENT_BINARY_DIR}/${LIB}.lib --no-whole-archive ${LIBS}
   )
 
   # Create new EXPORT file with def a
-  add_custom_target(${TARGET}.exp ALL
-    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.bas
-    COMMAND ${EPOC_PLATFORM}/gcc/bin/dlltool -m arm_interwork --def ${def_file} --dllname ${TARGET}[${UID3}].${EXTENSION}
-          --base-file ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.bas --output-exp ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.exp
+  add_custom_target(${FILENAME}.exp ALL
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${FILENAME}.bas
+    COMMAND ${EPOC_PLATFORM}/gcc/bin/dlltool -m arm_interwork --def ${def_file} --dllname ${FILENAME}[${UID3}].${EXTENSION}
+          --base-file ${CMAKE_CURRENT_BINARY_DIR}/${FILENAME}.bas --output-exp ${CMAKE_CURRENT_BINARY_DIR}/${FILENAME}.exp
   )
 
   # Create new interface LIB file with def a
-  add_custom_target(${TARGET}.lib ALL
-    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.exp
-    COMMAND ${EPOC_PLATFORM}/gcc/bin/dlltool -m arm_interwork --def ${def_file} --dllname ${TARGET}[${UID3}].${EXTENSION}
-          --base-file ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.bas --output-lib ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.lib
+  add_custom_target(${FILENAME}_tmp.lib ALL
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${FILENAME}.exp
+    COMMAND ${EPOC_PLATFORM}/gcc/bin/dlltool -m arm_interwork --def ${def_file} --dllname ${FILENAME}[${UID3}].${EXTENSION}
+          --base-file ${CMAKE_CURRENT_BINARY_DIR}/${FILENAME}.bas --output-lib ${CMAKE_CURRENT_BINARY_DIR}/${FILENAME}_tmp.lib
   )
 
-  add_custom_target(${TARGET}.map ALL
-    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.lib
-    COMMAND ${EPOC_PLATFORM}/gcc/bin/ld -s -e _E32Dll -u _E32Dll --dll ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.exp
-          -Map ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.map -o ${TARGET}_tmp.${EXTENSION} ${EPOC_LIB}/edll.lib
-          --whole-archive ${CMAKE_CURRENT_BINARY_DIR}/lib${TARGET}.a --no-whole-archive ${LIBS}
+  add_custom_target(${FILENAME}.map ALL
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${FILENAME}_tmp.lib
+    COMMAND ${EPOC_PLATFORM}/gcc/bin/ld -s -e _E32Dll -u _E32Dll --dll ${CMAKE_CURRENT_BINARY_DIR}/${FILENAME}.exp
+          -Map ${CMAKE_CURRENT_BINARY_DIR}/${FILENAME}.map -o ${FILENAME}_tmp.${EXTENSION} ${EPOC_LIB}/edll.lib
+          --whole-archive ${CMAKE_CURRENT_BINARY_DIR}/${LIB}.lib --no-whole-archive ${LIBS}
   )
 
-  add_custom_target(${TARGET}.${EXTENSION} ALL
-    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.map
-    COMMAND ${EPOC_PLATFORM}/Tools/petran ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}_tmp.${EXTENSION}
-          ${CMAKE_CURRENT_BINARY_DIR}/${source}.${EXTENSION} -nocall -uid1 ${UID1} -uid2 ${UID2} -uid3 ${UID3}
+  add_custom_target(${FILENAME}.${EXTENSION} ALL
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${FILENAME}.map
+    COMMAND ${EPOC_PLATFORM}/Tools/petran ${CMAKE_CURRENT_BINARY_DIR}/${FILENAME}_tmp.${EXTENSION}
+          ${CMAKE_CURRENT_BINARY_DIR}/${FILENAME}.${EXTENSION} -nocall -uid1 ${UID1} -uid2 ${UID2} -uid3 ${UID3}
   )
 endfunction()
 
