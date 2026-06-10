@@ -99,6 +99,9 @@ ngagesdk_add_static_imported_library(gdi "${EPOC_LIB}/gdi.lib")
 
 cmake_policy(SET CMP0053 NEW)  # Ensures proper argument parsing.
 
+# https://cmake.org/cmake/help/latest/prop_gbl/TARGET_SUPPORTS_SHARED_LIBS.html
+set_property(GLOBAL PROPERTY TARGET_SUPPORTS_SHARED_LIBS FALSE)
+
 # FIXME: build_dll is not implemented by ngagecc.py
 
 function(build_dll LIB FILENAME EXTENSION UID1 UID2 UID3 LIBS)
