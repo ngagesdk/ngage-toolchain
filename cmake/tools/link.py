@@ -630,7 +630,14 @@ def phase_link(linker_arguments, targets: LinkArtifactNames):
             exit_with_error(f"step3: {shared.EPOC32_LD} failed to generate {targets.step1_ld_base}")
 
         # Step 2
-        building.check_call([shared.EPOC32_DLLTOOL, "-m", "arm_interwork", "--base-file", targets.step1_ld_base, "--output-exp", targets.step2_dlltool_exp])
+        building.check_call([
+            shared.EPOC32_DLLTOOL,
+            "-m", "arm_interwork",
+            "--as", shared.EPOC32_AS,
+            "--base-file", targets.step1_ld_base,
+            "--output-exp", targets.step2_dlltool_exp
+        ])
+        #building.check_call([shared.EPOC32_DLLTOOL, "-m", "arm_interwork", "--base-file", targets.step1_ld_base, "--output-exp", targets.step2_dlltool_exp])
         if not os.path.isfile(targets.step2_dlltool_exp):
             exit_with_error(f"step2: {shared.EPOC32_DLLTOOL} failed to generate {targets.step2_dlltool_exp}")
 
