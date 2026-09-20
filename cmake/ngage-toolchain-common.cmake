@@ -38,6 +38,7 @@ set(S60_SDK_ROOT ${SDK_ROOT}/sdk/6.1)
 set(EPOC_PLATFORM ${S60_SDK_ROOT}/Shared/EPOC32)
 set(EPOC_LIB ${S60_SDK_ROOT}/Series60/Epoc32/Release/armi/urel)
 set(EPOC_EXTRAS ${SDK_ROOT}/extras)
+set(EPOC_TOOLS ${EPOC_PLATFORM}/Tools)
 
 # Fix where cmake files for lib are placed
 set(CMAKE_MODULE_PATH  "${CMAKE_MODULE_PATH};${EPOC_EXTRAS}/lib/cmake")
@@ -58,11 +59,6 @@ if(UNIX)
   set(CMAKE_C_LINKER_LAUNCHER "${CMAKE_CURRENT_LIST_DIR}/ngagecc")
   set(CMAKE_CXX_COMPILER_LAUNCHER "${CMAKE_CURRENT_LIST_DIR}/ngagecc")
   set(CMAKE_CXX_LINKER_LAUNCHER "${CMAKE_CURRENT_LIST_DIR}/ngagecc")
-
-  set(CMAKE_C_COMPILER "${EPOC_PLATFORM}/gcc/bin/arm-epoc-pe-gcc")
-  set(CMAKE_C_LINKER "${EPOC_PLATFORM}/gcc/bin/arm-epoc-pe-gcc")
-  set(CMAKE_CXX_COMPILER "${EPOC_PLATFORM}/gcc/bin/arm-epoc-pe-cpp")
-  set(CMAKE_CXX_LINKER "${EPOC_PLATFORM}/gcc/bin/arm-epoc-pe-cpp")
 
   set(CMAKE_OBJCOPY "${EPOC_PLATFORM}/gcc/bin/arm-epoc-pe-objcopy")
   set(CMAKE_OBJDUMP "${EPOC_PLATFORM}/gcc/bin/arm-epoc-pe-objdump")
@@ -203,7 +199,7 @@ function(build_dll_ex LIB FILENAME EXTENSION UID1 UID2 UID3 LIBS def_file)
   add_custom_command(
     OUTPUT ${bin}/${FILENAME}.${EXTENSION}
     DEPENDS ${bin}/${FILENAME}.map
-    COMMAND ${EPOC_PLATFORM}/Tools/petran ${bin}/${FILENAME}_tmp.${EXTENSION}
+    COMMAND ${EPOC_TOOLS}/petran ${bin}/${FILENAME}_tmp.${EXTENSION}
           ${bin}/${FILENAME}.${EXTENSION} -nocall -uid1 ${UID1} -uid2 ${UID2} -uid3 ${UID3})
 
   add_custom_target(${FILENAME}_${EXTENSION}_target ALL
@@ -257,7 +253,7 @@ function(build_resource source_dir basename extra_args)
     ${basename}.rsc
     ALL
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${basename}.RSS_Intermediate
-    COMMAND ${EPOC_PLATFORM}/Tools/rcomp -u -s${CMAKE_CURRENT_BINARY_DIR}/${basename}.RSS_Intermediate 
+    COMMAND ${EPOC_TOOLS}/rcomp -u -s${CMAKE_CURRENT_BINARY_DIR}/${basename}.RSS_Intermediate 
 	          -h${CMAKE_CURRENT_BINARY_DIR}/${basename}.rsg -o${CMAKE_CURRENT_BINARY_DIR}/${basename}.rsc)
 endfunction()
 
@@ -283,5 +279,5 @@ function(build_sis source_dir basename outputname)
     WORKING_DIRECTORY 
     ${source_dir}
     COMMAND
-    ${EPOC_PLATFORM}/Tools/makesis ${basename}.pkg ${CMAKE_CURRENT_BINARY_DIR}/${outputname}.sis)
+    ${EPOC_TOOLS}/makesis ${basename}.pkg ${CMAKE_CURRENT_BINARY_DIR}/${outputname}.sis)
 endfunction()
