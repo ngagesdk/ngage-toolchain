@@ -4,7 +4,7 @@
 
 (0x101F6F88), 0, 0, 0, {"Series60ProductID"}
 
-"..\out\build\N-Gage\triangle.exe"-"E:\System\Apps\triangle\triangle.exe"
+"..\out\build\N-Gage\game.exe"-"E:\System\Apps\triangle\triangle.exe"
 "..\out\build\N-Gage\launcher.app"-"E:\System\Apps\triangle\triangle.app"
 "..\out\build\N-Gage\launcher.rsc"-"E:\System\Apps\triangle\triangle.rsc"
 "..\out\build\N-Gage\launcher.aif"-"E:\System\Apps\triangle\triangle.aif"

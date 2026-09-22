@@ -235,7 +235,7 @@ endfunction()
 function(build_resource source_dir basename extra_args)
   add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${basename}.RSS_Intermediate
-    COMMAND ${GCC_CPP} ${extra_args} -I${S60_SDK_ROOT}/Series60/Epoc32/Include 
+    COMMAND ${EPOC_CPP} ${extra_args} -I${S60_SDK_ROOT}/Series60/Epoc32/Include 
 	          -I${source_dir} -I${source_dir}/../inc ${source_dir}/${basename}.rss ${CMAKE_CURRENT_BINARY_DIR}/${basename}.RSS_Intermediate)
 
   add_custom_target(
