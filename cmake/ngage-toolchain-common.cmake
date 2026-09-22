@@ -40,35 +40,33 @@ set(EPOC_LIB ${S60_SDK_ROOT}/Series60/Epoc32/Release/armi/urel)
 set(EPOC_EXTRAS ${SDK_ROOT}/extras)
 set(EPOC_TOOLS ${EPOC_PLATFORM}/Tools)
 
+set(NGAGE_LD_SYMLINKS "-L${S60_SDK_ROOT} -L${EPOC_PLATFORM} -L${EPOC_LIB}")
+
 # Fix where cmake files for lib are placed
 set(CMAKE_MODULE_PATH  "${CMAKE_MODULE_PATH};${EPOC_EXTRAS}/lib/cmake")
 
-set(CMAKE_C_COMPILER_LAUNCHER "${CMAKE_CURRENT_LIST_DIR}/ngagecc.bat")
-set(CMAKE_C_LINKER_LAUNCHER "${CMAKE_CURRENT_LIST_DIR}/ngagecc.bat")
-set(CMAKE_CXX_COMPILER_LAUNCHER "${CMAKE_CURRENT_LIST_DIR}/ngagec++.bat")
-set(CMAKE_CXX_LINKER_LAUNCHER "${CMAKE_CURRENT_LIST_DIR}/ngagec++.bat")
-
-set(CMAKE_OBJCOPY "${EPOC_PLATFORM}/gcc/bin/objcopy")
-set(CMAKE_OBJDUMP "${EPOC_PLATFORM}/gcc/bin/objdump")
-
-set(CMAKE_RANLIB "${EPOC_PLATFORM}/gcc/bin/ranlib.exe")
-#set(CMAKE_AR "${EPOC_PLATFORM}/gcc/bin/ar.exe")
-
-if(UNIX)
-  set(CMAKE_C_COMPILER_LAUNCHER "${CMAKE_CURRENT_LIST_DIR}/ngagecc")
-  set(CMAKE_C_LINKER_LAUNCHER "${CMAKE_CURRENT_LIST_DIR}/ngagecc")
-  set(CMAKE_CXX_COMPILER_LAUNCHER "${CMAKE_CURRENT_LIST_DIR}/ngagecc")
-  set(CMAKE_CXX_LINKER_LAUNCHER "${CMAKE_CURRENT_LIST_DIR}/ngagecc")
-
-  set(CMAKE_OBJCOPY "${EPOC_PLATFORM}/gcc/bin/arm-epoc-pe-objcopy")
-  set(CMAKE_OBJDUMP "${EPOC_PLATFORM}/gcc/bin/arm-epoc-pe-objdump")
-
-  set(CMAKE_RANLIB "${EPOC_PLATFORM}/gcc/bin/arm-epoc-pe-ranlib")
+if(WIN32)
+  set(CMAKE_C_COMPILER_LAUNCHER "${CMAKE_CURRENT_LIST_DIR}/ngagecc.bat")
+  set(CMAKE_C_LINKER_LAUNCHER "${CMAKE_CURRENT_LIST_DIR}/ngagecc.bat")
+  set(CMAKE_CXX_COMPILER_LAUNCHER "${CMAKE_CURRENT_LIST_DIR}/ngagec++.bat")
+  set(CMAKE_CXX_LINKER_LAUNCHER "${CMAKE_CURRENT_LIST_DIR}/ngagec++.bat")
 endif()
 
-set(NGAGE_CPPFLAGS "-DFUNCTION_NAME=__FUNCTION__ -D__NGAGE__=1 -D__SYMBIAN32__ -D__GCC32__ -D__EPOC32__ -D__MARM__ -D__MARM_ARMI__ -D_UNICODE")
-set(NGAGE_CPPFLAGS "${NGAGE_CPPFLAGS} -I ${EPOC_PLATFORM}/include -I ${EPOC_EXTRAS}/include -I ${S60_SDK_ROOT}/Series60/Epoc32/Include -I ${S60_SDK_ROOT}/Series60/Epoc32/Include/libc -I ${S60_SDK_ROOT}/Shared/EPOC32/ngagesdk/include" )
+if(WIN32)
+  SET(EPOC_DLLTOOL "${EPOC_PLATFORM}/gcc/bin/dlltool")
+  SET(EPOC_LD "${EPOC_PLATFORM}/gcc/bin/ld")
+  SET(EPOC_CPP "${EPOC_PLATFORM}/gcc/bin/cpp")
+  set(EPOC_AS "${EPOC_PLATFORM}/gcc/bin/as")
+elseif(UNIX)
+  set(EPOC_LD "${EPOC_PLATFORM}/gcc/bin/arm-epoc-pe-ld")
+  set(EPOC_DLLTOOL "${EPOC_PLATFORM}/gcc/bin/arm-epoc-pe-dlltool")
+  SET(EPOC_CPP "${EPOC_PLATFORM}/gcc/bin/arm-epoc-pe-cpp")
+  set(EPOC_AS "${EPOC_PLATFORM}/gcc/bin/arm-epoc-pe-as")
+  set(EPOC_PETRAN "${EPOC_TOOLS}/petran")
+endif()
 
+set(NGAGE_CPPFLAGS "-B${EPOC_PLATFORM}/gcc/arm-epoc-pe/bin -DFUNCTION_NAME=__FUNCTION__ -D__NGAGE__=1 -D__SYMBIAN32__ -D__GCC32__ -D__EPOC32__ -D__MARM__ -D__MARM_ARMI__ -D_UNICODE")
+set(NGAGE_CPPFLAGS "${NGAGE_CPPFLAGS} -I ${EPOC_PLATFORM}/include -I ${EPOC_EXTRAS}/include -I ${S60_SDK_ROOT}/Series60/Epoc32/Include -I ${S60_SDK_ROOT}/Series60/Epoc32/Include/libc -I ${S60_SDK_ROOT}/Shared/EPOC32/ngagesdk/include")
 set(NGAGE_CPPFLAGS "${NGAGE_CPPFLAGS} -s -fomit-frame-pointer -O2 -mthumb-interwork -pipe -nostdinc -mstructure-size-boundary=8")
 
 set(NGAGE_CFLAGS "${NGAGE_CPPFLAGS} -fno-leading-underscore")
@@ -77,11 +75,7 @@ set(NGAGE_CXXFLAGS "${NGAGE_CPPFLAGS} -march=armv4t -Wno-ctor-dtor-privacy")
 set(CMAKE_C_FLAGS_INIT "${NGAGE_CFLAGS}")
 set(CMAKE_CXX_FLAGS_INIT "${NGAGE_CXXFLAGS}")
 
-set(CMAKE_EXE_LINKER_FLAGS_INIT "")#-Wl,-e,_E32Startup -Wl,-u,_E32Startup")
-
-if(UNIX)
-  set(CMAKE_EXE_LINKER_FLAGS_INIT "-s MAIN_COMPAT=0 -nostartfiles -nodefaultlibs")
-endif()
+set(CMAKE_EXE_LINKER_FLAGS_INIT "")
 
 set(CMAKE_C_STANDARD_LIBRARIES "${EPOC_LIB}/eexe.lib")
 set(CMAKE_CXX_STANDARD_LIBRARIES "${EPOC_LIB}/eexe.lib")
@@ -120,7 +114,6 @@ ngagesdk_add_static_imported_library(efsrv "${EPOC_LIB}/efsrv.lib")
 ngagesdk_add_static_imported_library(scdv "${EPOC_LIB}/scdv.lib")
 ngagesdk_add_static_imported_library(gdi "${EPOC_LIB}/gdi.lib")
 
-
 # TODO: change to one location.
 if(WIN32)
   ngagesdk_add_static_imported_library(libgcc_ngage "${EPOC_PLATFORM}/ngagesdk/lib/gcc/arm-epoc-pe/4.6.4/libgcc_ngage.a")
@@ -134,20 +127,16 @@ endif()
 
 cmake_policy(SET CMP0053 NEW)  # Ensures proper argument parsing.
 
-if(WIN32)
-  SET(GCC_DLLTOOL "${EPOC_PLATFORM}/gcc/bin/dlltool")
-  SET(GCC_LD "${EPOC_PLATFORM}/gcc/bin/ld")
-  SET(GCC_CPP "${EPOC_PLATFORM}/gcc/bin/cpp")
-elseif(UNIX)
-  SET(GCC_DLLTOOL "${EPOC_PLATFORM}/gcc/arm-epoc-pe/bin/dlltool")
-  SET(GCC_LD "${EPOC_PLATFORM}/gcc/arm-epoc-pe/bin/ld")
-  SET(GCC_CPP "${EPOC_PLATFORM}/gcc/bin/arm-epoc-pe-cpp")
-
-  # Fix incorrect "as" program selector.
-  set(FORCE_AS --as "${EPOC_PLATFORM}/gcc/bin/arm-epoc-pe-as")
+if(UNIX)
+  # Multi-step EXECUTABLE link rule (replacement for ngagecc)
+  set(CMAKE_C_LINK_EXECUTABLE
+    "${EPOC_LD} -o <TARGET_BASE>_base.exe ${NGAGE_LD_SYMLINKS} -s -e _E32Startup -u _E32Startup -s <OBJECTS> <LINK_LIBRARIES> --base-file <TARGET_BASE>_base.bas"
+    "${EPOC_DLLTOOL} -m arm_interwork --as ${EPOC_AS} --base-file <TARGET_BASE>_base.bas --output-exp <TARGET_BASE>.exp"
+    "${EPOC_LD} -o <TARGET_BASE>_notran.exe ${NGAGE_LD_SYMLINKS} -s -e _E32Startup -u _E32Startup -s <OBJECTS> <LINK_LIBRARIES> game.exp"
+    "${EPOC_PETRAN} <TARGET_BASE>_notran.exe <TARGET_BASE>.exe -nocall <LINK_FLAGS> -stack 500000 -heap 1000000 20000000"
+  )
+  set(CMAKE_CXX_LINK_EXECUTABLE ${CMAKE_C_LINK_EXECUTABLE})
 endif()
-
-# FIXME: build_dll is not implemented by ngagecc.py
 
 function(build_dll LIB FILENAME EXTENSION UID1 UID2 UID3 LIBS)
   set(bin ${CMAKE_CURRENT_BINARY_DIR})
@@ -156,7 +145,7 @@ function(build_dll LIB FILENAME EXTENSION UID1 UID2 UID3 LIBS)
   add_custom_command(
     OUTPUT ${bin}/${FILENAME}.def
     DEPENDS ${bin}/${LIB}.lib
-    COMMAND ${GCC_DLLTOOL} -m arm_interwork --output-def ${bin}/${FILENAME}.def ${bin}/${LIB}.lib)
+    COMMAND ${EPOC_DLLTOOL} -m arm_interwork --output-def ${bin}/${FILENAME}.def ${bin}/${LIB}.lib)
 
   build_dll_ex("${LIB}" "${FILENAME}" "${EXTENSION}" "${UID1}" "${UID2}" "${UID3}" "${LIBS}" "${bin}/${FILENAME}.def")
 endfunction()
@@ -167,32 +156,32 @@ function(build_dll_ex LIB FILENAME EXTENSION UID1 UID2 UID3 LIBS def_file)
   add_custom_command(
     OUTPUT ${bin}/${FILENAME}_tmp.exp
     DEPENDS ${def_file}
-    COMMAND ${GCC_DLLTOOL} -m arm_interwork --def ${def_file} ${FORCE_AS}
+    COMMAND ${EPOC_DLLTOOL} -m arm_interwork --def ${def_file} --as ${EPOC_AS}
       --output-exp ${bin}/${FILENAME}_tmp.exp --dllname ${FILENAME}[${UID3}].${EXTENSION})
 
   add_custom_command(
     OUTPUT ${bin}/${FILENAME}.bas ${bin}/${FILENAME}_tmp.${EXTENSION}
     DEPENDS ${bin}/${FILENAME}_tmp.exp
-    COMMAND ${GCC_LD} -s -e _E32Dll -u _E32Dll ${bin}/${FILENAME}_tmp.exp --dll
+    COMMAND ${EPOC_LD} -s -e _E32Dll -u _E32Dll ${bin}/${FILENAME}_tmp.exp --dll
         --base-file ${bin}/${FILENAME}.bas -o ${bin}/${FILENAME}_tmp.${EXTENSION}
         ${EPOC_LIB}/edll.lib --whole-archive ${bin}/${LIB}.lib --no-whole-archive ${LIBS})
 
   add_custom_command(
     OUTPUT ${bin}/${FILENAME}.exp
     DEPENDS ${bin}/${FILENAME}.bas
-    COMMAND ${GCC_DLLTOOL} -m arm_interwork --def ${def_file} ${FORCE_AS} --dllname ${FILENAME}[${UID3}].${EXTENSION}
+    COMMAND ${EPOC_DLLTOOL} -m arm_interwork --def ${def_file} --as ${EPOC_AS} --dllname ${FILENAME}[${UID3}].${EXTENSION}
           --base-file ${bin}/${FILENAME}.bas --output-exp ${bin}/${FILENAME}.exp)
 
   add_custom_command(
     OUTPUT ${bin}/${FILENAME}_tmp.lib
     DEPENDS ${bin}/${FILENAME}.exp
-    COMMAND ${GCC_DLLTOOL} -m arm_interwork --def ${def_file} ${FORCE_AS} --dllname ${FILENAME}[${UID3}].${EXTENSION}
+    COMMAND ${EPOC_DLLTOOL} -m arm_interwork --def ${def_file} --as ${EPOC_AS} --dllname ${FILENAME}[${UID3}].${EXTENSION}
           --base-file ${bin}/${FILENAME}.bas --output-lib ${bin}/${FILENAME}_tmp.lib)
 
   add_custom_command(
     OUTPUT ${bin}/${FILENAME}.map
     DEPENDS ${bin}/${FILENAME}_tmp.lib
-    COMMAND ${GCC_LD} -s -e _E32Dll -u _E32Dll --dll ${bin}/${FILENAME}.exp
+    COMMAND ${EPOC_LD} -s -e _E32Dll -u _E32Dll --dll ${bin}/${FILENAME}.exp
           -Map ${bin}/${FILENAME}.map -o ${FILENAME}_tmp.${EXTENSION} ${EPOC_LIB}/edll.lib
           --whole-archive ${bin}/${LIB}.lib --no-whole-archive ${LIBS})
 
