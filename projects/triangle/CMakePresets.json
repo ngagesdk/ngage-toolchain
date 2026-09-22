@@ -1,0 +1,19 @@
+{
+  "version": 6,
+  "configurePresets": [
+    {
+      "name": "N-Gage",
+      "displayName": "N-Gage",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "toolchainFile": "$env{NGAGEDEV}/cmake/ngage-toolchain.cmake"
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "N-Gage",
+      "configurePreset": "N-Gage",
+      "verbose": false
+    }
+  ]
+}
