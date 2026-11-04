@@ -307,7 +307,7 @@ class Ports:
                 # available on macOS.
                 data = subprocess.check_output(['curl', '-sSL', url])
             else:
-                f = urlopen(url)
+                f = urlopen(url, timeout=30)
                 data = f.read()
 
             if sha512hash:
